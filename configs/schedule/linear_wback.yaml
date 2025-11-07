@@ -1,0 +1,4 @@
+name: linear_wback
+kwargs:
+  n_max: 50
+  factor: 0.05

@@ -1,0 +1,42 @@
+# @package _global_
+
+defaults:
+  - override /model: fc-baseline
+  - override /optimizer: adam
+  - override /data: entangled_mnist
+  - override /trainer: contrastive
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+epochs: 50
+
+optimizer:
+  learning_rate: 0.001
+
+data:
+  kwargs:
+    batch_size: 64
+
+trainer:
+  name: "contrastive"
+  kwargs:
+    train_clamped_n_iter : 7
+    train_free_n_iter : 7
+    eval_n_iter : 14
+
+model:
+  name: fc-baseline
+  kwargs:
+    dim_data: 100
+    dim_hidden: 300
+    num_labels: 10
+    strength_forth: 1.0
+    strength_back: 1.0
+    threshold_in: 10000.0
+    threshold_j: 10000.0
+    threshold_out: 10000.0
+    j_d: 0.5
+
+wandb:
+  tags: ["fc-baseline", "emnist", "contrastive"]

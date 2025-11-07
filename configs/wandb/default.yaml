@@ -1,0 +1,7 @@
+enabled: true
+entity: willinki-bocconi-university
+project: darnax-chores
+run_name: ${now:%Y%m%d-%H%M%S}-${model.name}
+mode: online
+tags: []
+dir: ${oc.env:WANDB_DIR,${hydra:runtime.output_dir}}

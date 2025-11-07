@@ -1,0 +1,5 @@
+name: entangled_mnist
+kwargs:
+  seed: 59
+  batch_size: 16
+  num_images_per_class:  null

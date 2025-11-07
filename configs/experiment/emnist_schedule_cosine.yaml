@@ -1,0 +1,50 @@
+# @package _global_
+
+defaults:
+  - override /model: fc-baseline
+  - override /optimizer: adam
+  - override /data: entangled_mnist
+  - override /trainer: dynamical
+  - override /schedule: cosine_win
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+epochs: 50
+
+optimizer:
+  learning_rate: 0.001
+
+data:
+  kwargs:
+    batch_size: 64
+
+trainer:
+  name: "dynamical"
+  kwargs:
+    warmup_n_iter : 1
+    train_clamped_n_iter : 7
+    train_free_n_iter : 7
+    eval_n_iter : 14
+
+schedule:
+  name: "cosine_win"
+  kwargs:
+    n_max: 50
+    final_val: 0.2
+
+model:
+  name: fc-baseline
+  kwargs:
+    dim_data: 100
+    dim_hidden: 300
+    num_labels: 10
+    strength_forth: 5.0
+    strength_back: 0.9
+    threshold_in: 1.0
+    threshold_j: 1.0
+    threshold_out: 1.0
+    j_d: 0.5
+
+wandb:
+  tags: ["fc-baseline", "emnist", "dynamical"]

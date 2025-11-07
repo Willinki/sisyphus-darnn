@@ -1,0 +1,4 @@
+name: cosine_win
+kwargs:
+  n_max: 50
+  final_val: 1.0
