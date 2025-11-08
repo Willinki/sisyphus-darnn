@@ -33,7 +33,7 @@ model:
   name: fc-baseline
   kwargs:
     dim_data: 512
-    dim_hidden: 300
+    dim_hidden: 1000
     num_labels: 10
     strength_forth: 5.0
     strength_back: 0.9

@@ -1,0 +1,9 @@
+name: "rp-sign-perceptron"
+kwargs:
+  input_dim: 512
+  proj_dim: 10
+  output_dim: 10
+  margin: 1.0
+  lr: 1e-3
+  rp_seed: 44
+  use_bias: false
