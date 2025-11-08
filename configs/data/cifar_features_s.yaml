@@ -1,0 +1,4 @@
+name: "cifar_features_s"
+kwargs:
+  batch_size : 64
+  x_transform : "sign"

@@ -19,7 +19,9 @@ from local_exp.datasets.registry import build_dataset
 logger = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../../configs", config_name="base")
+@hydra.main(
+    version_base=None, config_path="../../configs", config_name="base_lightning"
+)
 def main(cfg: DictConfig):
     # ---------- logging + config echo ----------
     logger.info(f"Working dir: {os.getcwd()}")
@@ -45,7 +47,7 @@ def main(cfg: DictConfig):
     pl.seed_everything(seed, workers=True)
 
     # ---------- Build model (LightningModule) ----------
-    model, _meta = build_model(cfg.model.name, **cfg.model.kwargs)
+    model, _ = build_model(cfg.model.name, **cfg.model.kwargs)
 
     # ---------- Build data (LightningDataModule) ----------
     ds = build_dataset(cfg.data.name, **cfg.data.kwargs)
@@ -91,9 +93,6 @@ def main(cfg: DictConfig):
     trainer.save_checkpoint(ckpt_path)
     torch.save(model.state_dict(), weights_path)
 
-    logger.info(f"Saved final checkpoint: {ckpt_path}")
-    logger.info(f"Saved state_dict:       {weights_path}")
-
     # ---------- Log as a W&B model artifact ----------
     try:
         artifact = wandb.Artifact(
@@ -116,6 +115,8 @@ def main(cfg: DictConfig):
         artifact.add_file(weights_path)
         run.log_artifact(artifact)
         logger.info("Uploaded W&B artifact.")
+        os.remove(ckpt_path)
+        os.remove(weights_path)
     except Exception as e:
         logger.exception(f"Failed to log W&B artifact: {e}")
 

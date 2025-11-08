@@ -1,0 +1,8 @@
+name: "binary-3layer-mlp"
+kwargs:
+  input_dim: 10 
+  hidden_dim: 10 
+  output_dim: 10 
+  gain: 10 
+  loss_type: "cross_entropy"
+  lr: 1e-3

@@ -1,0 +1,12 @@
+# SLURM job config
+job_name: pert_array              # --job-name=pert_array
+partition: gpu                    # --partition=gpu
+timeout_min: 1440                 # --time=1-00:00:00 (1 day limit)
+ntasks: 1                         # --ntasks=1
+cpus_per_task: 10                 # --cpus-per-task=10
+mem_gb: 64                        # --mem=64G
+gres: "gpu:1"                     # --gres=gpu:1  (preferred over --gpus)
+
+# Optional fields (not required for your setup)
+qos: ""                           # no QOS specified
+constraint: ""                    # no constraint specified
