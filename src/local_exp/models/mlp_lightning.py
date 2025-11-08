@@ -81,6 +81,28 @@ class LinearClipped(nn.Module):
         return x
 
 
+class LinearRelu(nn.Module):
+    """Linear layer followed by relu."""
+
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+    ):
+        super().__init__()
+        self.linear = nn.Linear(in_features, out_features, bias=bias)
+        self.relu = nn.ReLU()
+        self.reset_parameters()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.relu(self.linear(x))
+        return x
+
+    def reset_parameters(self):
+        pass
+
+
 # -----------------------------
 #  MLP Builders
 # -----------------------------
@@ -143,6 +165,45 @@ class MLPClipped(nn.Module):
         return self.net(x)
 
 
+class MLPRelu(nn.Module):
+    """Alternative MLP variant using Relu layers instead of tanh/binary ones."""
+
+    def __init__(
+        self,
+        layer_sizes: List[int],
+        use_bias: bool = True,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        blocks = []
+        L = len(layer_sizes) - 1
+        for i in range(L):
+            in_f, out_f = layer_sizes[i], layer_sizes[i + 1]
+            is_last = i == L - 1
+            if not is_last:
+                blocks.append(nn.Linear(in_f, out_f, bias=use_bias))
+                blocks.append(nn.ReLU())
+                if dropout > 0:
+                    blocks.append(nn.Dropout(dropout))
+            else:
+                # output layer: NO activation
+                blocks.append(nn.Linear(in_f, out_f, bias=use_bias))
+
+        self.net = nn.Sequential(*blocks)
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                # Kaiming init for ReLU nets
+                nn.init.kaiming_uniform_(m.weight, a=0.0, nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
 # -----------------------------
 #  Losses
 # -----------------------------
@@ -187,6 +248,7 @@ class ModelConfig:
     dropout: float = 0.0
     use_bias: bool = True
     use_clipped_layers: bool = False  # NEW
+    use_relu: bool = False
     loss_type: str = "cross_entropy"
     argmax_margin: float = 1.0
     num_classes: Optional[int] = None
@@ -198,8 +260,16 @@ class LitMLP(pl.LightningModule):
         self.save_hyperparameters(
             {"model_cfg": model_cfg.__dict__, "optim_cfg": optim_cfg.__dict__}
         )
+        if model_cfg.use_relu and model_cfg.use_clipped_layers:
+            raise ValueError("Cannot have relu and clipped layers")
 
-        if model_cfg.use_clipped_layers:
+        if model_cfg.use_relu:
+            self.model = MLPRelu(
+                layer_sizes=model_cfg.layer_sizes,
+                use_bias=model_cfg.use_bias,
+                dropout=model_cfg.dropout,
+            )
+        elif model_cfg.use_clipped_layers:
             self.model = MLPClipped(
                 layer_sizes=model_cfg.layer_sizes,
                 use_bias=model_cfg.use_bias,
@@ -267,7 +337,13 @@ class LitMLP(pl.LightningModule):
 
 @register_model("tanh-3layer-mlp")
 def build_tanh_mlp(
-    input_dim, hidden_dim, output_dim, gain, loss_type="cross_entropy", lr=1e-3
+    input_dim,
+    hidden_dim,
+    output_dim,
+    gain,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="adam",
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
@@ -278,13 +354,19 @@ def build_tanh_mlp(
         use_clipped_layers=False,
         loss_type=loss_type,
     )
-    optim_cfg = OptimConfig(name="adam", lr=lr, weight_decay=0.0)
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None
 
 
 @register_model("binary-3layer-mlp")
 def build_binary_mlp(
-    input_dim, hidden_dim, output_dim, gain, loss_type="cross_entropy", lr=1e-3
+    input_dim,
+    hidden_dim,
+    output_dim,
+    gain,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="adam",
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
@@ -295,13 +377,19 @@ def build_binary_mlp(
         use_clipped_layers=False,
         loss_type=loss_type,
     )
-    optim_cfg = OptimConfig(name="adam", lr=lr, weight_decay=0.0)
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None
 
 
 @register_model("clipped-3layer-mlp")
 def build_clipped_mlp(
-    input_dim, hidden_dim, output_dim, gain, loss_type="cross_entropy", lr=1e-3
+    input_dim,
+    hidden_dim,
+    output_dim,
+    gain,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="sgd",
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
@@ -312,5 +400,23 @@ def build_clipped_mlp(
         use_clipped_layers=True,
         loss_type=loss_type,
     )
-    optim_cfg = OptimConfig(name="adam", lr=lr, weight_decay=0.0)
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
+    return LitMLP(model_cfg, optim_cfg), None
+
+
+@register_model("relu-3layer-mlp")
+def build_clipped_mlp(
+    input_dim, hidden_dim, output_dim, loss_type="cross_entropy", lr=1e-3, optim="sgd"
+):
+    model_cfg = ModelConfig(
+        layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
+        activation_gain=0.0,  # Note: unused in relu, but kept for consistency
+        binarize_activations=False,  # not used in relu
+        dropout=0.0,
+        use_bias=True,
+        use_clipped_layers=False,  # needs to be false
+        use_relu=True,
+        loss_type=loss_type,
+    )
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None
