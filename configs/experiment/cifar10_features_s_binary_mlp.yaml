@@ -22,6 +22,7 @@ model:
     gain: 1.0
     loss_type: "argmax_margin"
     lr: 1e-3
+    optim: "sgd"
 
 wandb:
   tags: ["binary-mlp", "cifar-features-s"]

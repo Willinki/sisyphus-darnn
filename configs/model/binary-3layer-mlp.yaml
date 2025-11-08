@@ -6,3 +6,4 @@ kwargs:
   gain: 10 
   loss_type: "cross_entropy"
   lr: 1e-3
+  optim: "sgd"

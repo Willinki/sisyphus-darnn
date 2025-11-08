@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /model: tanh-3layer-mlp
+  - override /model: relu-3layer-mlp
   - override /data: cifar_features_s
   - override /wandb: default
   - override /cluster: cpu
@@ -14,18 +14,17 @@ data:
     x_transform : "identity"
 
 model:
-  name: "tanh-3layer-mlp"
+  name: "relu-3layer-mlp"
   kwargs:
     input_dim: 512
-    hidden_dim: 1000
+    hidden_dim: 4096
     output_dim: 10
-    gain: 1.0
-    loss_type: "argmax_margin"
+    loss_type: "cross_entropy"
     lr: 1e-3
     optim: "sgd"
 
 wandb:
-  tags: ["tanh-mlp", "cifar-features-s"]
+  tags: ["relu-mlp", "cifar-features-s", "cross_entropy"]
 
 # Global training knobs
 epochs: 50
