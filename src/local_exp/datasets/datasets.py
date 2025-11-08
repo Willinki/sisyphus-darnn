@@ -1,7 +1,10 @@
 from typing import Literal, Optional
 from .registry import register_dataset
 from darnax.datasets.classification.mnist import Mnist
-from darnax.datasets.classification.cifar10_features import Cifar10FeaturesSmall
+from darnax.datasets.classification.cifar10_features import (
+    Cifar10FeaturesSmall,
+    Cifar10FeaturesLarge,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -38,7 +41,7 @@ def build_general_mnist(
 
 
 @register_dataset("cifar_features_s")
-def build_general_mnist(
+def build_general_cifar_small(
     batch_size: int = 64,
     linear_projection: Optional[int] = None,
     *,
@@ -47,6 +50,24 @@ def build_general_mnist(
     x_transform: Literal["sign", "tanh", "identity"] = "sign",
 ):
     return Cifar10FeaturesSmall(
+        batch_size,
+        linear_projection,
+        num_images_per_class,
+        label_mode,
+        x_transform,
+    )
+
+
+@register_dataset("cifar_features_l")
+def build_general_cifar_large(
+    batch_size: int = 64,
+    linear_projection: Optional[int] = None,
+    *,
+    num_images_per_class: Optional[int] = None,
+    label_mode: Literal["pm1", "ooe", "c-rescale"] = "c-rescale",
+    x_transform: Literal["sign", "tanh", "identity"] = "sign",
+):
+    return Cifar10FeaturesLarge(
         batch_size,
         linear_projection,
         num_images_per_class,
