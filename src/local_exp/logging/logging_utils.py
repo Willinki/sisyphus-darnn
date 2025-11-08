@@ -1,127 +1,84 @@
-# train_pl_wandb.py
-import os
 import logging
-
-import hydra
-from omegaconf import DictConfig, OmegaConf
-
-import torch
-import pytorch_lightning as pl
-from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
-from pytorch_lightning.loggers import WandbLogger
-
+from jax import Array
+import jax.numpy as jnp
 import wandb
+from omegaconf import OmegaConf
+from darnax.orchestrators.sequential import SequentialOrchestrator
+from darnax.layer_maps.sparse import LayerMap
 
-from local_exp.datasets.jax_to_lightningdata import make_lightning_datamodule_from_jax
-from local_exp.models.registry import build_model
-from local_exp.datasets.registry import build_dataset
 
 logger = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../../configs", config_name="base")
-def main(cfg: DictConfig):
-    # ---------- logging + config echo ----------
-    logger.info(f"Working dir: {os.getcwd()}")
-    logger.info("Resolved config:\n" + OmegaConf.to_yaml(cfg, resolve=True))
+class Logger:
+    def __init__(self, cfg):
+        self.enabled = cfg.wandb.enabled
+        self.wandb = None
 
-    # ---------- W&B init (no custom Logger; do it here) ----------
-    logger.info("Initializing Weights & Biases")
-    run = wandb.init(
-        entity=cfg.wandb.entity,
-        project=cfg.wandb.project,
-        name=cfg.wandb.run_name,
-        dir=cfg.wandb.dir,
-        config=OmegaConf.to_container(cfg, resolve=True),
-        tags=list(cfg.wandb.tags),
-        save_code=True,
-        reinit=False,
-    )
-    # Wire PL logger to the active run
-    pl_logger = WandbLogger(experiment=run)
+        if self.enabled:
+            logger.info("Initializing wandb logger")
+            wandb.init(
+                entity=cfg.wandb.entity,
+                project=cfg.wandb.project,
+                name=cfg.wandb.run_name,
+                mode=cfg.wandb.mode,
+                dir=cfg.wandb.dir,
+                config=OmegaConf.to_container(cfg, resolve=True),
+                tags=list(cfg.wandb.tags),
+                save_code=True,
+                reinit=False,
+            )
+            self.wandb = wandb
 
-    # ---------- Reproducibility ----------
-    seed = int(cfg.master_seed)
-    pl.seed_everything(seed, workers=True)
+    def log_weights(self, orchestrator: SequentialOrchestrator, step: int):
+        if not self.enabled:
+            return
+        logger.info("Logging model weights")
+        lmap: LayerMap = orchestrator.lmap
+        for i, senders_group in lmap.row_items():
+            for j, mod in senders_group.items():
+                try:
+                    if i == j:
+                        weights = mod.J
+                    else:
+                        weights = mod.W
+                    self.wandb.log(
+                        {f"weights/{j}-to-{i}": wandb.Histogram(weights)},
+                        step=step,
+                        commit=False,
+                    )
+                except AttributeError as e:
+                    logger.info(f"{e} - SKIPPING")
 
-    # ---------- Build model (LightningModule) ----------
-    model, _meta = build_model(cfg.model.name, **cfg.model.kwargs)
+    def log_metrics(self, metrics: dict[str, float], step: int):
+        if not self.enabled:
+            return
+        logger.info("Logging metrics")
+        self.wandb.log(metrics, step=step, commit=False)
 
-    # ---------- Build data (LightningDataModule) ----------
-    ds = build_dataset(cfg.data.name, **cfg.data.kwargs)
-    data = make_lightning_datamodule_from_jax(ds, seed=seed)
-
-    # ---------- Callbacks ----------
-    lr_monitor = LearningRateMonitor(logging_interval="step")
-    ckpt_cb = ModelCheckpoint(
-        save_top_k=0,  # we manually save a final checkpoint at the end
-        save_last=True,  # keep last.ckpt for convenience
-        filename="last",
-        every_n_epochs=1,
-        auto_insert_metric_name=False,
-    )
-
-    # ---------- Trainer ----------
-    accelerator = getattr(cfg, "accelerator", "auto")
-    devices = getattr(cfg, "devices", "auto")
-    precision = getattr(cfg, "precision", "32-true")
-    log_every_n_steps = getattr(cfg, "log_every_n_steps", 50)
-    val_check_interval = getattr(cfg, "val_check_interval", 1.0)
-
-    trainer = pl.Trainer(
-        max_epochs=int(cfg.epochs),
-        accelerator=accelerator,
-        devices=devices,
-        precision=precision,
-        logger=pl_logger,
-        callbacks=[lr_monitor, ckpt_cb],
-        enable_progress_bar=True,
-        log_every_n_steps=log_every_n_steps,
-        val_check_interval=val_check_interval,
-    )
-
-    # ---------- Train ----------
-    trainer.fit(model, datamodule=data)
-
-    # ---------- Save final artifacts locally ----------
-    out_dir = os.getcwd()  # hydra's run dir
-    ckpt_path = os.path.join(out_dir, "final.ckpt")
-    weights_path = os.path.join(out_dir, "model_state_dict.pt")
-
-    trainer.save_checkpoint(ckpt_path)
-    torch.save(model.state_dict(), weights_path)
-
-    logger.info(f"Saved final checkpoint: {ckpt_path}")
-    logger.info(f"Saved state_dict:       {weights_path}")
-
-    # ---------- Log as a W&B model artifact ----------
-    try:
-        artifact = wandb.Artifact(
-            name=f"{cfg.model.name}-weights",
-            type="model",
-            description="Final Lightning checkpoint and PyTorch state_dict.",
-            metadata={
-                "model_name": cfg.model.name,
-                "epochs": int(cfg.epochs),
-                "seed": seed,
-                "data_name": cfg.data.name,
-                "trainer": {
-                    "accelerator": accelerator,
-                    "devices": str(devices),
-                    "precision": str(precision),
-                },
-            },
+    def log_overlaps_histograms(self, overlaps: list[list[Array | None]], step: int):
+        if not self.enabled:
+            return
+        logger.info("Logging overlaps histogram")
+        logger.warning("Keeping only layer one")
+        overlaps = jnp.concat([overlap[1] for overlap in overlaps])
+        different_overlaps_perc = jnp.mean(overlaps < 0.99)
+        overlaps_histograms = {"overlaps/prime_star_1": wandb.Histogram(overlaps)}
+        wandb.log(
+            overlaps_histograms
+            | {"overlaps/prime_star_is_different_ratio": different_overlaps_perc},
+            step=step,
+            commit=False,
         )
-        artifact.add_file(ckpt_path)
-        artifact.add_file(weights_path)
-        run.log_artifact(artifact)
-        logger.info("Uploaded W&B artifact.")
-    except Exception as e:
-        logger.exception(f"Failed to log W&B artifact: {e}")
 
-    # ---------- Finish W&B run (since we created it here) ----------
-    wandb.finish()
+    def commit(self, step: int):
+        if not self.enabled:
+            return
+        logger.info("Committing logs")
+        self.wandb.log({"step": step}, step=step, commit=True)
 
-
-if __name__ == "__main__":
-    main()
+    def finish(self):
+        if not self.enabled:
+            return
+        logger.info("finishing run")
+        self.wandb.finish()
