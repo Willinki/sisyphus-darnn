@@ -35,6 +35,8 @@ def main(cfg: DictConfig):
 
     # build dataset from registry
     ds = build_dataset(cfg.data.name, **cfg.data.kwargs)
+    master_key, data_key = jax.random.split(master_key)
+    ds.build(data_key)
 
     # build optimizer (just adam for now)
     optimizer = optax.adam(learning_rate=cfg.optimizer.learning_rate)
@@ -66,7 +68,7 @@ def main(cfg: DictConfig):
         logger.info("Evaluating and computing overlaps")
         accs = []
         overlaps_batches = []
-        for x_b, y_b in ds.iter_eval():
+        for x_b, y_b in ds.iter_test():
             master_key, metrics = trainer.eval_step(x_b, y_b, master_key)
             accs.append(metrics["accuracy"])
             overlaps = compute_overlaps(
