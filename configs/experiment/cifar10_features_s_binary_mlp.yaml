@@ -7,9 +7,6 @@ defaults:
   - override /cluster: cpu
   - _self_
 
-optimizer:
-  learning_rate: 0.001
-
 data:
   name: "cifar_features_s"
   kwargs:

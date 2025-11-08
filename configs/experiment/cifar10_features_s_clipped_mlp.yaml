@@ -7,9 +7,6 @@ defaults:
   - override /cluster: cpu
   - _self_
 
-optimizer:
-  learning_rate: 0.001
-
 data:
   name: "cifar_features_s"
   kwargs:
@@ -30,6 +27,6 @@ wandb:
   tags: ["clipped-mlp", "cifar-features-s"]
 
 # Global training knobs
-epochs: 10
+epochs: 50
 name: ${model.name}/${data.name}
 master_seed: 44
