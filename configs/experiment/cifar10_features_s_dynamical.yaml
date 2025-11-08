@@ -32,7 +32,7 @@ trainer:
 model:
   name: fc-baseline
   kwargs:
-    dim_data: 100
+    dim_data: 512
     dim_hidden: 300
     num_labels: 10
     strength_forth: 5.0
