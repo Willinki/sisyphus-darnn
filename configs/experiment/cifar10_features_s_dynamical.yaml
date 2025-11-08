@@ -3,9 +3,8 @@
 defaults:
   - override /model: fc-baseline
   - override /optimizer: adam
-  - override /data: entangled_mnist
+  - override /data: cifar_features_s
   - override /trainer: dynamical
-  - override /schedule: cosine_win
   - override /wandb: default
   - override /cluster: cpu
   - _self_
@@ -27,12 +26,6 @@ trainer:
     train_free_n_iter : 7
     eval_n_iter : 14
 
-schedule:
-  name: "cosine_win"
-  kwargs:
-    n_max: 50
-    final_val: 0.2
-
 model:
   name: fc-baseline
   kwargs:
@@ -47,4 +40,4 @@ model:
     j_d: 0.5
 
 wandb:
-  tags: ["fc-baseline", "emnist", "dynamical"]
+  tags: ["fc-baseline", "cifar10", "dynamical"]
