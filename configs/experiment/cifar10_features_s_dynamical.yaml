@@ -15,16 +15,19 @@ optimizer:
   learning_rate: 0.001
 
 data:
+  name: cifar_features_s
   kwargs:
     batch_size: 64
+    x_transform : "identity"
+# x_transform: "sign" to binarize data
 
 trainer:
   name: "dynamical"
   kwargs:
     warmup_n_iter : 1
-    train_clamped_n_iter : 7
-    train_free_n_iter : 7
-    eval_n_iter : 14
+    train_clamped_n_iter : 10
+    train_free_n_iter : 10
+    eval_n_iter : 20
 
 model:
   name: fc-baseline
