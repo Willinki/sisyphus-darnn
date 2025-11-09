@@ -1,6 +1,6 @@
 enabled: true
 entity: willinki-bocconi-university
-project: darnax-new-benchmarks
+project: darnax-new-benchmarks-v2
 run_name: ${now:%Y%m%d-%H%M%S}-${model.name}
 mode: online
 tags: []
