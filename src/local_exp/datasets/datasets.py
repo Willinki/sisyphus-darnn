@@ -25,10 +25,9 @@ def build_entangled_mnist(batch_size: int, num_images_per_class: int):
 def build_general_mnist(
     batch_size: int = 64,
     linear_projection: Optional[int] = None,
-    *,
     num_images_per_class: Optional[int] = None,
     label_mode: Literal["pm1", "ooe", "c-rescale"] = "c-rescale",
-    x_transform: Literal["sign", "tanh", "identity"] = "sign",
+    x_transform: Literal["sign", "tanh", "identity"] = "identity",
 ):
     return Mnist(
         batch_size,

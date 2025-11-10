@@ -1,4 +1,4 @@
-name: entangled_mnist
+name: general_mnist
 kwargs:
   batch_size: 64
   num_images_per_class:  null
