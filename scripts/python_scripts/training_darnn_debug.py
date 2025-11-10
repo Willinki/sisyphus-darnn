@@ -35,7 +35,7 @@ DEFAULT_CFG = {
         "kwargs": {
             "seed": 44,
             "dim_data": 784,
-            "dim_hidden": 128,
+            "dim_hidden": 1024,
             "num_labels": 10,
             "strength_forth": 1.0,
             "strength_back": 0.5,
