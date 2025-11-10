@@ -1,0 +1,7 @@
+name: entangled_mnist
+kwargs:
+  batch_size: 64
+  num_images_per_class:  null
+  x_transform:  identity
+  linear_projection: null
+  label_mode:  "c-rescale"

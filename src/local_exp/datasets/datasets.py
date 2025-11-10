@@ -16,7 +16,6 @@ def build_entangled_mnist(batch_size: int, num_images_per_class: int):
         batch_size,
         num_images_per_class=num_images_per_class,
         linear_projection=100,
-        flatten=True,
         label_mode="c-rescale",
         x_transform="sign",
     )

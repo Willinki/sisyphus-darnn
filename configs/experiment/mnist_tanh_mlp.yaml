@@ -1,0 +1,33 @@
+# @package _global_
+
+defaults:
+  - override /model: tanh-3layer-mlp
+  - override /data: general_mnist
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+data:
+  name: "general_mnist"
+  kwargs:
+    batch_size : 64
+    x_transform : "identity"
+
+model:
+  name: "tanh-3layer-mlp"
+  kwargs:
+    input_dim: 512
+    hidden_dim: 1000
+    output_dim: 10
+    gain: 1.0
+    loss_type: "argmax_margin"
+    lr: 1e-3
+    optim: "sgd"
+
+wandb:
+  tags: ["tanh-mlp", "mnist"]
+
+# Global training knobs
+epochs: 50
+name: ${model.name}/${data.name}
+master_seed: 44
