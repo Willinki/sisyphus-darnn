@@ -19,7 +19,7 @@ data:
 model:
   name: "relu-3layer-mlp"
   kwargs:
-    input_dim: 728
+    input_dim: 748
     hidden_dim: 4096
     output_dim: 10
     loss_type: "cross_entropy"

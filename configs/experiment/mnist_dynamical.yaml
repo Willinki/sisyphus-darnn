@@ -34,7 +34,7 @@ trainer:
 model:
   name: fc-baseline
   kwargs:
-    dim_data: 728
+    dim_data: 784
     dim_hidden: 1000
     num_labels: 10
     strength_forth: 5.0

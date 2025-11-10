@@ -19,7 +19,7 @@ data:
 model:
   name: rp-sign-perceptron
   kwargs:
-    input_dim: 728
+    input_dim: 748
     proj_dim: 1000
     output_dim: 10
     margin: 1.0
