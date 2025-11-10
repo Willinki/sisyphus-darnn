@@ -24,13 +24,11 @@ hydra:
     chdir: false
     config:
       override_dirname:
-        include_keys: [model, data]
         exclude_keys: [name]
   run:
     dir: outputs/${name}/${now:%Y-%m-%d-%H-%M-%S}
   sweep:
     dir: multirun/${name}/${now:%Y-%m-%d-%H-%M-%S}
-    subdir: cfg:${hydra.job.override_dirname}-${hydra.job.num}
   launcher:
     # use run.dir so it works for both single-run and multirun
     submitit_folder: ${hydra.run.dir}/.submitit/%j
