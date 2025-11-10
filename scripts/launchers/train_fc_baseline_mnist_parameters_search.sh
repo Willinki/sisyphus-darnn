@@ -45,7 +45,7 @@ uv run python3.11 scripts/python_scripts/training_darnn.py \
     epoch=100 \
     model.kwargs.strength_forth=4.0 \
     model.kwargs.strength_back=0.9 \
-    model.kwargs.j_d=0.7 \
+    'model.kwargs.j_d=0.7,0.9' \
     'optimizer.learning_rate=0.001,0.0002,0.005' \
     'model.kwargs.threshold_in=0.8,1.0,1.2' \
     'model.kwargs.threshold_j=0.8,1.0,1.2' \
@@ -58,7 +58,7 @@ uv run python3.11 scripts/python_scripts/training_darnn.py \
     epoch=100 \
     model.kwargs.strength_forth=4.0 \
     model.kwargs.strength_back=1.1 \
-    model.kwargs.j_d=0.7 \
+    'model.kwargs.j_d=0.7,0.9' \
     'optimizer.learning_rate=0.001,0.0002,0.005' \
     'model.kwargs.threshold_in=0.8,1.0,1.2' \
     'model.kwargs.threshold_j=0.8,1.0,1.2' \
