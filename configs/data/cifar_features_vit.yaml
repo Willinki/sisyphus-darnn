@@ -1,0 +1,4 @@
+name: "cifar_features_vit"
+kwargs:
+  batch_size : 64
+  x_transform : "identity"

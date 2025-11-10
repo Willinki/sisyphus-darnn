@@ -16,7 +16,7 @@ data:
 model:
   name: "binary-3layer-mlp"
   kwargs:
-    input_dim: 512
+    input_dim: 192
     hidden_dim: 1000
     output_dim: 10
     gain: 1.0
@@ -25,7 +25,7 @@ model:
     optim: "sgd"
 
 wandb:
-  tags: ["binary-mlp", "cifar-features-s"]
+  tags: ["binary-mlp", "cifar-features-vit"]
 
 # Global training knobs
 epochs: 50

@@ -1,10 +1,10 @@
 # @package _global_
 
 defaults:
-  - override /model: binary-3layer-mlp
+  - override /model: tanh-3layer-mlp
   - override /data: cifar_features_vit
   - override /wandb: default
-  - override /cluster: cpu
+  - override /cluster: gpu
   - _self_
 
 data:
@@ -14,9 +14,9 @@ data:
     x_transform : "identity"
 
 model:
-  name: "binary-3layer-mlp"
+  name: "tanh-3layer-mlp"
   kwargs:
-    input_dim: 512
+    input_dim: 192
     hidden_dim: 1000
     output_dim: 10
     gain: 1.0
@@ -25,7 +25,7 @@ model:
     optim: "sgd"
 
 wandb:
-  tags: ["binary-mlp", "cifar-features-s"]
+  tags: ["tanh-mlp", "cifar-features-vit"]
 
 # Global training knobs
 epochs: 50

@@ -4,6 +4,7 @@ from darnax.datasets.classification.mnist import Mnist
 from darnax.datasets.classification.cifar10_features import (
     Cifar10FeaturesSmall,
     Cifar10FeaturesLarge,
+    Cifar10FeaturesVit,
 )
 import logging
 
@@ -66,6 +67,24 @@ def build_general_cifar_large(
     x_transform: Literal["sign", "tanh", "identity"] = "sign",
 ):
     return Cifar10FeaturesLarge(
+        batch_size,
+        linear_projection,
+        num_images_per_class,
+        label_mode,
+        x_transform,
+    )
+
+
+@register_dataset("cifar_features_vit")
+def build_general_cifar_vit(
+    batch_size: int = 64,
+    linear_projection: Optional[int] = None,
+    *,
+    num_images_per_class: Optional[int] = None,
+    label_mode: Literal["pm1", "ooe", "c-rescale"] = "c-rescale",
+    x_transform: Literal["sign", "tanh", "identity"] = "sign",
+):
+    return Cifar10FeaturesVit(
         batch_size,
         linear_projection,
         num_images_per_class,

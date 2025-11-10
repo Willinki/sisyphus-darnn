@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - override /model: binary-3layer-mlp
+  - override /model: rp-sign-perceptron
   - override /data: cifar_features_vit
   - override /wandb: default
   - override /cluster: cpu
@@ -12,20 +12,22 @@ data:
   kwargs:
     batch_size : 64
     x_transform : "identity"
+    label_mode: "pm1"
 
 model:
-  name: "binary-3layer-mlp"
+  name: rp-sign-perceptron
   kwargs:
-    input_dim: 512
-    hidden_dim: 1000
+    input_dim: 192
+    proj_dim: 1000
     output_dim: 10
-    gain: 1.0
-    loss_type: "argmax_margin"
+    margin: 1.0
     lr: 1e-3
-    optim: "sgd"
+    rp_seed: 44
+    use_bias: false
+
 
 wandb:
-  tags: ["binary-mlp", "cifar-features-s"]
+  tags: ["rp-sign-perceptron", "cifar-features-vit"]
 
 # Global training knobs
 epochs: 50
