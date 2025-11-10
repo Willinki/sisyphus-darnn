@@ -6,7 +6,7 @@ defaults:
   - override /data: general_mnist
   - override /trainer: dynamical
   - override /wandb: default
-  - override /cluster: cpu
+  - override /cluster: gpu
   - _self_
 
 epochs: 50
