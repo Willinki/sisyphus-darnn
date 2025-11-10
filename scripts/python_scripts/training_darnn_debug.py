@@ -171,6 +171,8 @@ def main():
             f" | epoch time: {time.time() - t0:.2f}s"
         )
 
+    logger.info("Training complete")
+
 
 if __name__ == "__main__":
     main()
