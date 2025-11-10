@@ -19,7 +19,7 @@ data:
 model:
   name: "clipped-3layer-mlp"
   kwargs:
-    input_dim: 512
+    input_dim: 728
     hidden_dim: 1000
     output_dim: 10
     gain: 1.0
