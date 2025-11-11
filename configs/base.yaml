@@ -12,7 +12,7 @@ defaults:
 
 # Global training knobs
 name: training/${model.name}/${data.name}
-master_seed: 44
+master_seed: 59
 work_dir: ${oc.env:WORK_DIR,${hydra:runtime.cwd}}
 
 # Only derive values you truly need here
