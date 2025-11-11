@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 from .registry import register_dataset
 from darnax.datasets.classification.mnist import Mnist
+from darnax.datasets.classification.fashion_mnist import FashionMnist
 from darnax.datasets.classification.cifar10_features import (
     Cifar10FeaturesSmall,
     Cifar10FeaturesLarge,
@@ -90,4 +91,17 @@ def build_general_cifar_vit(
         num_images_per_class,
         label_mode,
         x_transform,
+    )
+
+
+@register_dataset("fashion_mnist")
+def build_fashion_mnist(
+    batch_size: int = 64,
+    linear_projection: Optional[int] = None,
+    num_images_per_class: Optional[int] = None,
+    label_mode: Literal["pm1", "ooe", "c-rescale"] = "c-rescale",
+    x_transform: Literal["sign", "tanh", "identity"] = "identity",
+):
+    return FashionMnist(
+        batch_size, linear_projection, num_images_per_class, label_mode, x_transform
     )

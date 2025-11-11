@@ -1,0 +1,36 @@
+# @package _global_
+
+defaults:
+  - override /model: clipped-3layer-mlp
+  - override /data: fashion_mnist
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+data:
+  name: "fashion_mnist"
+  kwargs:
+    batch_size: 64
+    num_images_per_class:  null
+    x_transform:  identity
+    linear_projection: null
+    label_mode:  "c-rescale"
+
+model:
+  name: "clipped-3layer-mlp"
+  kwargs:
+    input_dim: 784
+    hidden_dim: 1000
+    output_dim: 10
+    gain: 1.0
+    loss_type: "argmax_margin"
+    lr: 2e-4
+    optim: "sgd"
+
+wandb:
+  tags: ["clipped-mlp", "fashion_mnist"]
+
+# Global training knobs
+epochs: 50
+name: ${model.name}/${data.name}
+master_seed: 44

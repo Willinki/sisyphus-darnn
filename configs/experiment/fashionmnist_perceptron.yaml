@@ -1,0 +1,37 @@
+# @package _global_
+
+defaults:
+  - override /model: rp-sign-perceptron
+  - override /data: fashion_mnist
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+data:
+  name: "general_mnist"
+  kwargs:
+    batch_size: 64
+    num_images_per_class:  null
+    x_transform:  identity
+    linear_projection: null
+    label_mode: "pm1"
+
+model:
+  name: rp-sign-perceptron
+  kwargs:
+    input_dim: 784
+    proj_dim: 1000
+    output_dim: 10
+    margin: 1.0
+    lr: 1e-3
+    rp_seed: 44
+    use_bias: false
+
+
+wandb:
+  tags: ["rp-sign-perceptron", "fashion_mnist"]
+
+# Global training knobs
+epochs: 50
+name: ${model.name}/${data.name}
+master_seed: 44
