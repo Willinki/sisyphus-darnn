@@ -98,6 +98,10 @@ def main(cfg: DictConfig):
         wandb_logger.log_overlaps_histograms(overlaps_batches, step=epoch)
         wandb_logger.commit(step=epoch)
 
+        if epoch == 4:
+            if acc_train < 0.82:
+                break
+
     wandb_logger.finish()
 
 

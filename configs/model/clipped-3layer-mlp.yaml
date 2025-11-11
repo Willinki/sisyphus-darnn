@@ -7,3 +7,4 @@ kwargs:
   loss_type: "cross_entropy"
   lr: 1e-3
   optim: "sgd"
+  argmax_margin: 1.0

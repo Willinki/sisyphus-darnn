@@ -406,7 +406,13 @@ def build_clipped_mlp(
 
 @register_model("relu-3layer-mlp")
 def build_clipped_mlp(
-    input_dim, hidden_dim, output_dim, loss_type="cross_entropy", lr=1e-3, optim="sgd"
+    input_dim,
+    hidden_dim,
+    output_dim,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="sgd",
+    argmax_margin=1.0,
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
@@ -417,6 +423,7 @@ def build_clipped_mlp(
         use_clipped_layers=False,  # needs to be false
         use_relu=True,
         loss_type=loss_type,
+        argmax_margin=argmax_margin,
     )
     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None

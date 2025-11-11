@@ -26,6 +26,7 @@ model:
     loss_type: "argmax_margin"
     lr: 1e-3
     optim: "sgd"
+    argmax_margin: 1.0
 
 wandb:
   tags: ["clipped-mlp", "mnist"]
