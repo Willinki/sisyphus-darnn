@@ -390,6 +390,7 @@ def build_clipped_mlp(
     loss_type="cross_entropy",
     lr=1e-3,
     optim="sgd",
+    argmax_margin=1.0,
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
@@ -399,6 +400,7 @@ def build_clipped_mlp(
         use_bias=True,
         use_clipped_layers=True,
         loss_type=loss_type,
+        argmax_margin=argmax_margin,
     )
     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None
@@ -412,7 +414,6 @@ def build_clipped_mlp(
     loss_type="cross_entropy",
     lr=1e-3,
     optim="sgd",
-    argmax_margin=1.0,
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
