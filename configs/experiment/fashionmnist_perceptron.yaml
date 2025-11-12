@@ -8,7 +8,7 @@ defaults:
   - _self_
 
 data:
-  name: "general_mnist"
+  name: "fashion_mnist"
   kwargs:
     batch_size: 64
     num_images_per_class:  null
