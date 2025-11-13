@@ -2,12 +2,14 @@ from darnax.trainers.interface import AbstractOrchestrator
 from darnax.trainers.dynamical import DynamicalTrainer
 from darnax.trainers.hebbian_contrastive import ContrastiveHebbianTrainer
 from darnax.trainers.alternate import AltTrainer
+from local_exp.trainers.dynamical_v2 import DynamicalTrainerV2
 from typing import Callable, Dict
 
 _TRAINER_REGISTRY: Dict[str, Callable] = {
     "dynamical": DynamicalTrainer,
     "contrastive": ContrastiveHebbianTrainer,
     "alternative": AltTrainer,
+    "dynamical_v2": DynamicalTrainerV2,
 }
 
 
