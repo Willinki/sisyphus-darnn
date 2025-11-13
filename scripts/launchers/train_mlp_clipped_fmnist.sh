@@ -7,6 +7,6 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.optim=sgd \
     'model.kwargs.hidden_dim=128,256,512,1024' \
     'model.kwargs.gain=1.0' \
-    'model.kwargs.lr=0.001,0.0002,0.0005' \
-    'model.kwargs.argmax_margin=1.0,0.8,1.2' \
+    'model.kwargs.lr=0.001,0.0002,0.0005,0.0001,0.00005' \
+    'model.kwargs.argmax_margin=1.0,0.8,1.2,0.5,0.2' \
     --multirun
