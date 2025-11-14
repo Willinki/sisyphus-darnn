@@ -106,8 +106,9 @@ class FrozenRescaledFullyConnected(Adapter):
 
         """
         C = self.W.shape[0]
-        a = 1 / 2 * (C / 2 + 1 / 2)
-        b = 1 / 2 * (C / 2 - 1 / 2)
+        Cr_m1 = (C - 1) ** 0.5
+        a = 1 / 2 * (Cr_m1 / 2 + 1 / Cr_m1)
+        b = 1 / 2 * (Cr_m1 / 2 - 1 / Cr_m1)
         return (x * a + b) @ self.W
 
     def backward(self, x: Array, y: Array, y_hat: Array) -> Self:

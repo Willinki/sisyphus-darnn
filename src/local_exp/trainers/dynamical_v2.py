@@ -9,7 +9,7 @@ from optax import GradientTransformation
 from darnax.orchestrators.interface import AbstractOrchestrator
 from darnax.states.interface import State
 from darnax.trainers.interface import Trainer
-from darnax.trainers.utils import batch_accuracy, scan_n, misclassified_indexes
+from darnax.trainers.utils import batch_accuracy, scan_n
 from darnax.utils.typing import PyTree
 
 StateT = TypeVar("StateT", bound=State)
@@ -251,13 +251,10 @@ class DynamicalTrainerV2(
 
         # 4) metrics
         accuracy = batch_accuracy(y_true=jnp.asarray(y), y_pred=jnp.asarray(y_pred))
-        misclassified_idx = misclassified_indexes(
-            y_true=jnp.asarray(y), y_pred=jnp.asarray(y_pred)
-        )
         return (
             rng,
             state,
-            {"accuracy": accuracy, "misclassified_idx": misclassified_idx},
+            {"accuracy": accuracy},
         )
 
     @staticmethod
