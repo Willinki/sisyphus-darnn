@@ -1,0 +1,6 @@
+name: "dynamical_v2"
+kwargs:
+  warmup_n_iter : 1
+  train_clamped_n_iter : 7
+  train_free_n_iter : 7
+  eval_n_iter : 14

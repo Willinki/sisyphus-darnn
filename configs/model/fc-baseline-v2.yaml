@@ -1,0 +1,14 @@
+name: fc-baseline-stable-output
+kwargs:
+  seed: 44
+  dim_data: 100
+  dim_hidden: 1600
+  num_labels: 10
+  strength_forth: 1.0
+  strength_back: 0.5
+  threshold_in: 1.0
+  threshold_j: 1.0
+  threshold_out: 1.0
+  threshold_back: 1.0
+  j_d: 0.5
+  j_d_output: 0.5

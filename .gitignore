@@ -214,3 +214,5 @@ outputs/*
 lightning_logs/*
 **.pyc
 .venv/*
+ray_results/*
+wandb_logs/*

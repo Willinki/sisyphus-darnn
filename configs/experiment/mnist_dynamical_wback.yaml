@@ -1,8 +1,8 @@
 # @package _global_
 
 defaults:
-  - override /model: fc-baseline
-  - override /optimizer: adam
+  - override /model: fc-baseline-v2
+  - override /optimizer: adam_with_filter
   - override /data: general_mnist
   - override /trainer: dynamical
   - override /wandb: default
@@ -13,6 +13,10 @@ epochs: 50
 
 optimizer:
   learning_rate: 0.001
+  special:
+    learning_rate: 0.0
+    to_idx: 1
+    from_idx: 2
 
 data:
   name: general_mnist 
@@ -27,22 +31,24 @@ trainer:
   name: "dynamical"
   kwargs:
     warmup_n_iter : 1
-    train_clamped_n_iter : 9 # in order to match we need one less
+    train_clamped_n_iter : 10
     train_free_n_iter : 10
     eval_n_iter : 20
 
 model:
-  name: fc-baseline
+  name: fc-baseline-v2
   kwargs:
     dim_data: 784
-    dim_hidden: 1000
+    dim_hidden: 128
     num_labels: 10
     strength_forth: 4.0
     strength_back: 0.9
     threshold_in: 0.8
-    threshold_j: 1.0
+    threshold_j: 0.8
     threshold_out: 1.0
+    threshold_back: 0.8
     j_d: 0.5
 
 wandb:
-  tags: ["fc-baseline", "mnist", "dynamical"]
+  tags: ["fc-baseline", "mnist", "dynamical", "wback-trained"]
+  run_name: "mnist-dynamical-wbacktrained"

@@ -27,7 +27,7 @@ trainer:
   name: "dynamical"
   kwargs:
     warmup_n_iter : 1
-    train_clamped_n_iter : 9 # in order to match we need one less
+    train_clamped_n_iter : 10
     train_free_n_iter : 10
     eval_n_iter : 20
 
@@ -35,14 +35,15 @@ model:
   name: fc-baseline
   kwargs:
     dim_data: 784
-    dim_hidden: 1000
+    dim_hidden: 128
     num_labels: 10
     strength_forth: 4.0
     strength_back: 0.9
     threshold_in: 0.8
-    threshold_j: 1.0
+    threshold_j: 0.8
     threshold_out: 1.0
     j_d: 0.5
 
 wandb:
-  tags: ["fc-baseline", "mnist", "dynamical"]
+  tags: ["fc-baseline", "mnist", "alternative"]
+  run_name: "mnist-alternative"

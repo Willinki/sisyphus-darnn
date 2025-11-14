@@ -1,10 +1,10 @@
 # @package _global_
 
 defaults:
-  - override /model: fc-baseline
+  - override /model: fc-baseline-v2
   - override /optimizer: adam
   - override /data: general_mnist
-  - override /trainer: dynamical
+  - override /trainer: dynamical_v2
   - override /wandb: default
   - override /cluster: gpu
   - _self_
@@ -15,7 +15,7 @@ optimizer:
   learning_rate: 0.001
 
 data:
-  name: general_mnist 
+  name: general_mnist
   kwargs:
     batch_size: 64
     num_images_per_class:  null
@@ -24,25 +24,29 @@ data:
     label_mode:  "c-rescale"
 
 trainer:
-  name: "dynamical"
+  name: "dynamical_v2"
   kwargs:
     warmup_n_iter : 1
-    train_clamped_n_iter : 9 # in order to match we need one less
+    train_clamped_n_iter : 10
     train_free_n_iter : 10
     eval_n_iter : 20
 
 model:
-  name: fc-baseline
+  name: fc-baseline-stable-output
   kwargs:
-    dim_data: 784
-    dim_hidden: 1000
+    seed: 44
+    dim_data: 100
+    dim_hidden: 1600
     num_labels: 10
-    strength_forth: 4.0
-    strength_back: 0.9
-    threshold_in: 0.8
+    strength_forth: 1.0
+    strength_back: 0.5
+    threshold_in: 1.0
     threshold_j: 1.0
     threshold_out: 1.0
+    threshold_back: 1.0
     j_d: 0.5
+    j_d_output: 0.5
 
 wandb:
-  tags: ["fc-baseline", "mnist", "dynamical"]
+  tags: ["fc-baseline", "mnist", "alternative"]
+  run_name: "mnist-alternative"

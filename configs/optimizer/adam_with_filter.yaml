@@ -1,0 +1,5 @@
+learning_rate: 0.002
+special:
+  learning_rate: 0.0
+  from_idx: 0
+  to_idx: 0
