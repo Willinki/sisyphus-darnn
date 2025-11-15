@@ -49,7 +49,7 @@ BASE_CONFIG: dict[str, Any] = {
         "enabled": True,
         "entity": "willinki-bocconi-university",
         "project": "darnax-new-benchmarks-v2",
-        "run_name": f"mnist-search",
+        "run_name": f"emnist-size100",
         "mode": "online",
         "tags": ["fc-baseline", "emnist", "dynamical"],
         "dir": os.getenv("WANDB_DIR", "./wandb_logs"),
