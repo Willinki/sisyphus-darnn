@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=darnn_tuning
-#SBATCH --partition=gpu
+#SBATCH --partition=long_gpu
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=64gb
