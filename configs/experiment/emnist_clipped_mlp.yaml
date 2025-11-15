@@ -1,0 +1,37 @@
+# @package _global_
+
+defaults:
+  - override /model: clipped-3layer-mlp
+  - override /data: general_mnist
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+data:
+  name: "general_mnist"
+  kwargs:
+    batch_size: 64
+    num_images_per_class:  null
+    x_transform:  sign
+    linear_projection: 100
+    label_mode:  "c-rescale"
+
+model:
+  name: "clipped-3layer-mlp"
+  kwargs:
+    input_dim: 784
+    hidden_dim: 128
+    output_dim: 10
+    gain: 1.0
+    loss_type: "argmax_margin"
+    lr: 1e-3
+    optim: "sgd"
+    argmax_margin: 1.0
+
+wandb:
+  tags: ["clipped-mlp", "mnist"]
+
+# Global training knobs
+epochs: 50
+name: ${model.name}/${data.name}
+master_seed: 44
