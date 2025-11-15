@@ -47,9 +47,9 @@ BASE_CONFIG: dict[str, Any] = {
     },
     "wandb": {
         "enabled": True,
-        "entity": "willinki-bocconi-university",
+        "entity": "mattia-scardecchia",
         "project": "darnax-new-benchmarks-v2",
-        "run_name": f"you_exp",
+        "run_name": f"prova",
         "mode": "online",
         "tags": ["fc-baseline", "emnist", "dynamical"],
         "dir": os.getenv("WANDB_DIR", "./wandb_logs"),

@@ -7,7 +7,7 @@ defaults:
   - wandb: default
   - cluster: cpu
   - _self_
-  - experiment: null          # placeholder; experiment files slot in here
+  - experiment: null # placeholder; experiment files slot in here
   - override hydra/launcher: submitit_slurm
 
 # Global training knobs

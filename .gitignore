@@ -3,6 +3,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+wandb_logs
+logs
+*.ckpt
+
 # C extensions
 *.so
 

@@ -1,5 +1,5 @@
 enabled: true
-entity: willinki-bocconi-university
+entity: mattia-scardecchia
 project: darnax-new-benchmarks-v2
 run_name: ${now:%Y%m%d-%H%M%S}-${model.name}
 mode: online

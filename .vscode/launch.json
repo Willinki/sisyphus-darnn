@@ -1,16 +1,18 @@
 {
-    // Usare IntelliSense per informazioni sui possibili attributi.
-    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
-    // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debugger Python: File corrente con argomenti",
+            "name": "main",
+            "python": "/scratch/work/yang-lab/users/ms16518/conda_envs/reb/bin/python",
+            "cwd": "/home/ms16518/ws/milano/sisyphus-darnn",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "justMyCode": false,
+            "program": "/home/ms16518/ws/milano/sisyphus-darnn/scripts/composable_experiment/main.py",
             "console": "integratedTerminal",
-            "args": "${command:pickArgs}"
         }
     ]
 }

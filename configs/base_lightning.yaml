@@ -2,12 +2,10 @@
 defaults:
   - model: binary-3layer-mlp
   - data: cifar_features_s
-  - optimizer: adam
   - wandb: default
-  - cluster: cpu
   - _self_
-  - experiment: null          # placeholder; experiment files slot in here
-  - override hydra/launcher: submitit_slurm
+  - experiment: null # placeholder; experiment files slot in here
+  # - override hydra/launcher: submitit_slurm
 
 work_dir: ${oc.env:WORK_DIR,${hydra:runtime.cwd}}
 
@@ -26,14 +24,14 @@ hydra:
   sweep:
     dir: multirun/${name}/${now:%Y-%m-%d-%H-%M-%S}
     subdir: cfg:${hydra.job.override_dirname}
-  launcher:
-    # use run.dir so it works for both single-run and multirun
-    submitit_folder: ${hydra.run.dir}/.submitit/%j
-    timeout_min: ${cluster.timeout_min}
-    cpus_per_task: 10
-    mem_gb: ${cluster.mem_gb}
-    nodes: 1
-    name: ${hydra.job.name}
-    partition: ${cluster.partition}
-    gpus_per_task: ${cluster.gpus_per_task}
-    array_parallelism: 4
+  # launcher:
+  #   # use run.dir so it works for both single-run and multirun
+  #   submitit_folder: ${hydra.run.dir}/.submitit/%j
+  #   timeout_min: ${cluster.timeout_min}
+  #   cpus_per_task: 10
+  #   mem_gb: ${cluster.mem_gb}
+  #   nodes: 1
+  #   name: ${hydra.job.name}
+  #   partition: ${cluster.partition}
+  #   gpus_per_task: ${cluster.gpus_per_task}
+  #   array_parallelism: 4

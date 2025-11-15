@@ -1,12 +1,12 @@
 # search_optuna_asha.py  (Ray-free single run)
 from typing import Dict, Any
-import os, time
-from datetime import datetime
+import time
 from copy import deepcopy
-import uuid
 import logging
 
+import hydra
 import wandb
+from omegaconf import OmegaConf
 import jax
 import jax.numpy as jnp
 import equinox as eqx
@@ -14,7 +14,7 @@ import optax
 
 from local_exp.models.registry import build_model
 from local_exp.datasets.registry import build_dataset
-from local_exp.trainers.registry import build_trainer
+from local_exp.trainers.registry import DynamicalTrainer, build_trainer
 from local_exp.utils.learning_rate import make_lr_map_v2
 from config_dict import BASE_CONFIG
 from local_exp.scratch.normalizer import decay
@@ -30,18 +30,23 @@ from debug_runtime import (
 logger = logging.getLogger(__name__)
 
 
+@hydra.main(
+    version_base=None, config_path="../../configs", config_name="ours_entangled_mnist"
+)
 def train_once(cfg: Dict[str, Any]) -> None:
     cfg = deepcopy(cfg)
     key = jax.random.key(cfg.get("master_seed", 0))
     wb = cfg["wandb"]
     if wb.get("enabled", True):
+        cfg_for_wandb = OmegaConf.to_container(cfg, resolve=True)
+
         wandb.init(
             entity=wb["entity"],
             project=wb["project"],
             name=wb["run_name"],
             mode=wb["mode"],
             dir=wb["dir"],
-            config=deepcopy(cfg),
+            config=cfg_for_wandb,
             tags=list(wb.get("tags", [])),
             save_code=wb.get("save_code", True),
         )
@@ -70,7 +75,7 @@ def train_once(cfg: Dict[str, Any]) -> None:
     )
     opt_state = optimizer.init(eqx.filter(orchestrator, eqx.is_inexact_array))
 
-    trainer = build_trainer(
+    trainer: DynamicalTrainer = build_trainer(
         cfg["trainer"]["name"],
         orchestrator=orchestrator,
         state=state,
@@ -133,7 +138,7 @@ def train_once(cfg: Dict[str, Any]) -> None:
             )
 
         print(
-            f"Epoch {epoch:03d} | train_acc={acc_train:.4f} | eval_acc={acc_eval:.4f} | time={time.time()-t0:.2f}s"
+            f"Epoch {epoch:03d} | train_acc={acc_train:.4f} | eval_acc={acc_eval:.4f} | time={time.time() - t0:.2f}s"
         )
 
     if wb.get("enabled", True):
@@ -141,4 +146,4 @@ def train_once(cfg: Dict[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-    train_once(BASE_CONFIG)
+    train_once()

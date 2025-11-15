@@ -4,7 +4,6 @@ defaults:
   - override /model: binary-3layer-mlp
   - override /data: general_mnist
   - override /wandb: default
-  - override /cluster: cpu
   - _self_
 
 data:
@@ -12,14 +11,14 @@ data:
   kwargs:
     batch_size: 64
     num_images_per_class: null
-    x_transform: identity
-    linear_projection: null
+    x_transform: sign
+    linear_projection: 100
     label_mode: "c-rescale"
 
 model:
   name: "binary-3layer-mlp"
   kwargs:
-    input_dim: 784
+    input_dim: 100
     hidden_dim: 1000
     output_dim: 10
     gain: 1.0
@@ -31,6 +30,6 @@ wandb:
   tags: ["binary-mlp", "mnist"]
 
 # Global training knobs
-epochs: 50
+epochs: 200
 name: ${model.name}/${data.name}
 master_seed: 44
