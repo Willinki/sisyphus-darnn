@@ -63,10 +63,12 @@ class LinearClipped(nn.Module):
         out_features: int,
         bias: bool = True,
         binarize: bool = True,
+        clamp: bool = True,
     ):
         super().__init__()
         self.linear = nn.Linear(in_features, out_features, bias=bias)
         self.binarize = BinaryActivationSTE() if binarize else None
+        self.clamp = clamp
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -75,7 +77,10 @@ class LinearClipped(nn.Module):
             nn.init.zeros_(self.linear.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = torch.clamp(self.linear(x), -1.0, 1.0)
+        if self.clamp:
+            x = torch.clamp(self.linear(x), -1.0, 1.0)
+        else:
+            x = self.linear(x)
         if self.binarize is not None:
             x = self.binarize(x)
         return x
@@ -150,19 +155,62 @@ class MLPClipped(nn.Module):
         use_bias: bool = True,
         dropout: float = 0.0,
         binarize: bool = True,
+        clamp: bool = True,
     ):
         super().__init__()
         blocks = []
-        for i in range(len(layer_sizes) - 1):
+        for i in range(len(layer_sizes) - 2):
             in_f, out_f = layer_sizes[i], layer_sizes[i + 1]
-            is_last = i == len(layer_sizes) - 2
-            blocks.append(LinearClipped(in_f, out_f, bias=use_bias, binarize=binarize))
-            if not is_last and dropout > 0:
+            blocks.append(
+                LinearClipped(
+                    in_f,
+                    out_f,
+                    bias=use_bias,
+                    binarize=binarize,
+                    clamp=clamp,
+                )
+            )
+            if dropout > 0:
                 blocks.append(nn.Dropout(dropout))
+        blocks.append(
+            nn.Linear(layer_sizes[-2], layer_sizes[-1], bias=use_bias)
+        )  # last layer: no clipping/binarization
+        self.blocks = blocks
         self.net = nn.Sequential(*blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
+
+    def forward_features(self, x: torch.Tensor) -> torch.Tensor:
+        """Final hidden layer (before last LinearClipped)."""
+        layers = list(self.net.children())
+        for layer in layers[:-1]:
+            x = layer(x)
+        return x
+
+    def toggle_freeze_backbone(self, freeze: bool):
+        """Freeze or unfreeze all layers except the last one."""
+        for layer in self.blocks[:-1]:
+            for param in layer.parameters():
+                param.requires_grad = not freeze
+
+    def toggle_freeze_readout(self, freeze: bool):
+        """Freeze or unfreeze only the last layer."""
+        for param in self.blocks[-1].parameters():
+            param.requires_grad = not freeze
+
+    def set_readout_weights(self, weight_matrix: torch.Tensor):
+        """Set the weights of the last layer to the given weight matrix."""
+        last_layer = self.blocks[-1]
+        if not isinstance(last_layer, LinearClipped):
+            raise ValueError("Last layer is not a LinearClipped layer.")
+        if last_layer.linear.weight.shape != weight_matrix.shape:
+            raise ValueError(
+                f"Weight matrix shape {weight_matrix.shape} does not match "
+                f"last layer weight shape {last_layer.linear.weight.shape}."
+            )
+        with torch.no_grad():
+            last_layer.linear.weight.copy_(weight_matrix)
 
 
 class MLPRelu(nn.Module):
@@ -255,7 +303,12 @@ class ModelConfig:
 
 
 class LitMLP(pl.LightningModule):
-    def __init__(self, model_cfg: ModelConfig, optim_cfg: OptimConfig = OptimConfig()):
+    def __init__(
+        self,
+        model_cfg: ModelConfig,
+        optim_cfg: OptimConfig = OptimConfig(),
+        clamp: bool = True,  # ignored unless use_clipped_layers is True
+    ):
         super().__init__()
         self.save_hyperparameters(
             {"model_cfg": model_cfg.__dict__, "optim_cfg": optim_cfg.__dict__}
@@ -275,6 +328,7 @@ class LitMLP(pl.LightningModule):
                 use_bias=model_cfg.use_bias,
                 dropout=model_cfg.dropout,
                 binarize=model_cfg.binarize_activations,
+                clamp=clamp,
             )
         else:
             self.model = MLP(
@@ -391,40 +445,42 @@ def build_clipped_mlp(
     lr=1e-3,
     optim="sgd",
     argmax_margin=1.0,
+    use_bias=True,
+    clamp=True,
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
         activation_gain=gain,  # Note: unused in MLPClipped, but kept for consistency
         binarize_activations=True,
         dropout=0.0,
-        use_bias=True,
+        use_bias=use_bias,
         use_clipped_layers=True,
         loss_type=loss_type,
         argmax_margin=argmax_margin,
     )
     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
-    return LitMLP(model_cfg, optim_cfg), None
+    return LitMLP(model_cfg, optim_cfg, clamp=clamp), None
 
 
-@register_model("relu-3layer-mlp")
-def build_clipped_mlp(
-    input_dim,
-    hidden_dim,
-    output_dim,
-    loss_type="cross_entropy",
-    lr=1e-3,
-    optim="sgd",
-):
-    model_cfg = ModelConfig(
-        layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
-        activation_gain=0.0,  # Note: unused in relu, but kept for consistency
-        binarize_activations=False,  # not used in relu
-        dropout=0.0,
-        use_bias=True,
-        use_clipped_layers=False,  # needs to be false
-        use_relu=True,
-        loss_type=loss_type,
-        argmax_margin=argmax_margin,
-    )
-    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
-    return LitMLP(model_cfg, optim_cfg), None
+# @register_model("relu-3layer-mlp")
+# def build_clipped_mlp(
+#     input_dim,
+#     hidden_dim,
+#     output_dim,
+#     loss_type="cross_entropy",
+#     lr=1e-3,
+#     optim="sgd",
+# ):
+#     model_cfg = ModelConfig(
+#         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
+#         activation_gain=0.0,  # Note: unused in relu, but kept for consistency
+#         binarize_activations=False,  # not used in relu
+#         dropout=0.0,
+#         use_bias=True,
+#         use_clipped_layers=False,  # needs to be false
+#         use_relu=True,
+#         loss_type=loss_type,
+#         argmax_margin=argmax_margin,
+#     )
+#     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
+#     return LitMLP(model_cfg, optim_cfg), None

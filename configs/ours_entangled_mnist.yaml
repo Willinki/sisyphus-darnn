@@ -1,12 +1,12 @@
 epochs: 100
 
 optimizer:
-  learning_rate_wout: 0.1
   learning_rate_j: 0.005
-  learning_rate_win: 0.085
-  weight_decay_win: 0.0
-  weight_decay_wout: 0.005
+  learning_rate_wout: ${optimizer.learning_rate_j}
+  learning_rate_win: ${optimizer.learning_rate_j}
   weight_decay_j: 0.005
+  weight_decay_win: ${optimizer.weight_decay_j}
+  weight_decay_wout: ${optimizer.weight_decay_j}
 
 data:
   name: general_mnist
@@ -34,8 +34,8 @@ model:
     num_labels: 10
     strength_forth: 5.0
     strength_back: 1.4
-    threshold_in: 1.4
     threshold_j: 1.4
+    threshold_in: ${model.kwargs.threshold_j}
     threshold_out: 3.0
     j_d: 0.5
 
