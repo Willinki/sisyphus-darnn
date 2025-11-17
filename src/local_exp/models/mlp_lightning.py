@@ -142,23 +142,21 @@ class MLP(nn.Module):
 
 
 class MLPClipped(nn.Module):
-    """Alternative MLP variant using LinearClipped layers instead of tanh/binary ones."""
-
-    def __init__(
-        self,
-        layer_sizes: List[int],
-        use_bias: bool = True,
-        dropout: float = 0.0,
-        binarize: bool = True,
-    ):
+    def __init__(self, layer_sizes, use_bias=True, dropout=0.0, binarize=True):
         super().__init__()
         blocks = []
-        for i in range(len(layer_sizes) - 1):
+        L = len(layer_sizes) - 1
+        for i in range(L):
             in_f, out_f = layer_sizes[i], layer_sizes[i + 1]
-            is_last = i == len(layer_sizes) - 2
-            blocks.append(LinearClipped(in_f, out_f, bias=use_bias, binarize=binarize))
-            if not is_last and dropout > 0:
-                blocks.append(nn.Dropout(dropout))
+            is_last = i == L - 1
+            if not is_last:
+                blocks.append(
+                    LinearClipped(in_f, out_f, bias=use_bias, binarize=binarize)
+                )
+                if dropout > 0:
+                    blocks.append(nn.Dropout(dropout))
+            else:
+                blocks.append(nn.Linear(in_f, out_f, bias=use_bias))  # unclipped output
         self.net = nn.Sequential(*blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

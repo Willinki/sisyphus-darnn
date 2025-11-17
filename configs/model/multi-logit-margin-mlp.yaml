@@ -1,0 +1,11 @@
+name: multi-logit-margin-mlp
+kwargs:
+  input_dim: 100
+  hidden_dim: 100
+  output_dim: 10
+  kappa: 1.0
+  lr: 1e-3
+  optim: "sgd"
+  dropout: 0.0
+  use_bias: False
+  reduction: "batch_mean_class_sum"
