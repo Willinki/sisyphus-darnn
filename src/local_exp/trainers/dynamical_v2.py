@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from typing import Any, Generic, TypeVar
 
 import equinox as eqx
+import jax
 import jax.numpy as jnp
 from jax import Array
 from optax import GradientTransformation
@@ -154,6 +155,15 @@ class DynamicalTrainerV2(
             filter_messages="forward",
             skip_output_state=True,
         )
+
+        # computing neuromodulator
+        # rng, predict_key = jax.random.split(rng)
+        # state_prediction = orchestrator.predict(state, rng=predict_key)
+        # p_s = jax.nn.softmax(state_prediction.readout, axis=-1)
+        # neuromodulator = p_s[:, jnp.argmax(y, axis=-1)]  # shape (B,)
+
+        # restarting from warmup state
+        state = state.replace_val(-1, y)
         (state, rng), _ = scan_n(
             orchestrator.step,
             (state, rng),
@@ -165,12 +175,13 @@ class DynamicalTrainerV2(
             orchestrator.step,
             (state, rng),
             n_iter=ctx["free_iter"],
-            filter_messages="all",
+            filter_messages="forward",
             skip_output_state=True,
         )
 
         # 3) local/backprop deltas shaped like orchestrator
         grads = orchestrator.backward(state, rng=rng)
+        # grads = orchestrator.backward(state, rng=rng, gate=neuromodulator)
 
         # 4) filter trainable leaves
         params = eqx.filter(orchestrator, eqx.is_inexact_array)
