@@ -2,7 +2,6 @@
 # debug_runtime.py
 from typing import Dict, Tuple, List
 import jax
-import wandb
 
 JaxArray = jax.Array
 

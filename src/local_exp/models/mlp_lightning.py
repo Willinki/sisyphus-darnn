@@ -202,15 +202,14 @@ class MLPClipped(nn.Module):
     def set_readout_weights(self, weight_matrix: torch.Tensor):
         """Set the weights of the last layer to the given weight matrix."""
         last_layer = self.blocks[-1]
-        if not isinstance(last_layer, LinearClipped):
-            raise ValueError("Last layer is not a LinearClipped layer.")
-        if last_layer.linear.weight.shape != weight_matrix.shape:
+        assert isinstance(last_layer, nn.Linear)
+        if last_layer.weight.shape != weight_matrix.shape:
             raise ValueError(
                 f"Weight matrix shape {weight_matrix.shape} does not match "
-                f"last layer weight shape {last_layer.linear.weight.shape}."
+                f"last layer weight shape {last_layer.weight.shape}."
             )
         with torch.no_grad():
-            last_layer.linear.weight.copy_(weight_matrix)
+            last_layer.weight.copy_(weight_matrix)
 
 
 class MLPRelu(nn.Module):

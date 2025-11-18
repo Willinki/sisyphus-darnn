@@ -20,11 +20,11 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 # Conda
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp_hetero.py \
     --multirun \
-    model.kwargs.hidden_dim=100 \
+    model.kwargs.hidden_dim=100,200,400,800,1600,3200,6400 \
     model.kwargs.lr=0.005 \
     epochs=200 \
     epochs_readout=50 \
     'wandb.tags=[mlp,square-tanh,hetero,BASELINE]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
-    model.kwargs.loss_type="cross_entropy"
+    model.kwargs.loss_type="argmax_margin"

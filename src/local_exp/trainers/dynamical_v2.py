@@ -4,6 +4,7 @@ from typing import Any, Generic, TypeVar
 import equinox as eqx
 import jax.numpy as jnp
 from jax import Array
+from jax.nn import softmax
 from optax import GradientTransformation
 
 from darnax.orchestrators.interface import AbstractOrchestrator
@@ -154,6 +155,12 @@ class DynamicalTrainerV2(
             filter_messages="forward",
             skip_output_state=True,
         )
+
+        state_prediction, rng = orchestrator.predict(state, rng=rng)
+        probas = softmax(state_prediction.readout, axis=-1)
+        gate = 1 - probas[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]  # shape (B,)
+        state = state.replace_val(-1, y)
+
         (state, rng), _ = scan_n(
             orchestrator.step,
             (state, rng),
@@ -170,7 +177,8 @@ class DynamicalTrainerV2(
         )
 
         # 3) local/backprop deltas shaped like orchestrator
-        grads = orchestrator.backward(state, rng=rng)
+        # grads = orchestrator.backward(state, rng=rng)
+        grads = orchestrator.backward(state, rng=rng, gate=gate)
 
         # 4) filter trainable leaves
         params = eqx.filter(orchestrator, eqx.is_inexact_array)

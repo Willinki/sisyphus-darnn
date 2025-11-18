@@ -13,6 +13,42 @@
             "justMyCode": false,
             "program": "/home/ms16518/ws/milano/sisyphus-darnn/scripts/composable_experiment/main.py",
             "console": "integratedTerminal",
+        },
+        {
+            "name": "hetero",
+            "python": "/scratch/work/yang-lab/users/ms16518/conda_envs/reb/bin/python",
+            "cwd": "/home/ms16518/ws/milano/sisyphus-darnn",
+            "type": "debugpy",
+            "request": "launch",
+            "justMyCode": false,
+            "program": "/home/ms16518/ws/milano/sisyphus-darnn/scripts/python_scripts/training_mlp_hetero.py",
+            "console": "integratedTerminal",
+            "args": [
+                "model.kwargs.hidden_dim=100",
+                "model.kwargs.lr=0.005",
+                "epochs=200",
+                "epochs_readout=50",
+                "model.kwargs.use_bias=false",
+            ]
+        },
+        {
+            "name": "mlp",
+            "python": "/scratch/work/yang-lab/users/ms16518/conda_envs/reb/bin/python",
+            "cwd": "/home/ms16518/ws/milano/sisyphus-darnn",
+            "type": "debugpy",
+            "request": "launch",
+            "justMyCode": false,
+            "program": "/home/ms16518/ws/milano/sisyphus-darnn/scripts/python_scripts/training_mlp.py",
+            "console": "integratedTerminal",
+            "args": [
+                "experiment=entangled_mnist_binary_mlp",
+                "model.kwargs.hidden_dim=100",
+                "model.kwargs.lr=0.0005",
+                "epochs=200",
+                "model.name=clipped-3layer-mlp",
+                "model.kwargs.use_bias=true",
+                "model.kwargs.clamp=false"
+            ]
         }
     ]
 }

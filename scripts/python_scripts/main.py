@@ -14,9 +14,8 @@ import optax
 
 from local_exp.models.registry import build_model
 from local_exp.datasets.registry import build_dataset
-from local_exp.trainers.registry import DynamicalTrainer, build_trainer
+from local_exp.trainers.registry import build_trainer
 from local_exp.utils.learning_rate import make_lr_map_v2
-from config_dict import BASE_CONFIG
 from local_exp.scratch.normalizer import decay
 
 from metrics_debug import DEBUG_METRICS
@@ -34,6 +33,7 @@ logger = logging.getLogger(__name__)
     version_base=None, config_path="../../configs", config_name="ours_entangled_mnist"
 )
 def train_once(cfg: Dict[str, Any]) -> None:
+    print("beginning...")
     cfg = deepcopy(cfg)
     key = jax.random.key(cfg.get("master_seed", 0))
     wb = cfg["wandb"]
@@ -51,31 +51,27 @@ def train_once(cfg: Dict[str, Any]) -> None:
             save_code=wb.get("save_code", True),
         )
 
+    print("initialized wandb")
     state, orchestrator = build_model(cfg["model"]["name"], **cfg["model"]["kwargs"])
     ds = build_dataset(cfg["data"]["name"], **cfg["data"]["kwargs"])
     key, data_key = jax.random.split(key)
     ds.build(data_key)
 
-    # build optimizer with map(just adam for now)
     lr_map = make_lr_map_v2(
         orchestrator, overrides={(1, 0): "w_in", (1, 1): "j", (2, 1): "w_out"}
     )
     optimizer = optax.multi_transform(
         {
             "default": optax.sgd(learning_rate=0.0),
-            "w_in": optax.sgd(
-                learning_rate=BASE_CONFIG["optimizer"]["learning_rate_win"]
-            ),
-            "w_out": optax.sgd(
-                learning_rate=BASE_CONFIG["optimizer"]["learning_rate_wout"]
-            ),
-            "j": optax.sgd(learning_rate=BASE_CONFIG["optimizer"]["learning_rate_j"]),
+            "w_in": optax.sgd(learning_rate=cfg["optimizer"]["learning_rate_win"]),
+            "w_out": optax.sgd(learning_rate=cfg["optimizer"]["learning_rate_wout"]),
+            "j": optax.sgd(learning_rate=cfg["optimizer"]["learning_rate_j"]),
         },
         lr_map,
     )
     opt_state = optimizer.init(eqx.filter(orchestrator, eqx.is_inexact_array))
 
-    trainer: DynamicalTrainer = build_trainer(
+    trainer = build_trainer(
         cfg["trainer"]["name"],
         orchestrator=orchestrator,
         state=state,
@@ -83,6 +79,8 @@ def train_once(cfg: Dict[str, Any]) -> None:
         optimizer_state=opt_state,
         **cfg["trainer"]["kwargs"],
     )
+
+    print("initialized trainer")
 
     # ---- saving norms ----
     for epoch in range(0, int(cfg["epochs"]) + 1):
@@ -92,7 +90,7 @@ def train_once(cfg: Dict[str, Any]) -> None:
         if epoch != 0:
             for xb, yb in ds:
                 key = trainer.train_step(xb, yb, key)
-                trainer.orchestrator = decay(trainer.orchestrator, BASE_CONFIG)
+                trainer.orchestrator = decay(trainer.orchestrator, cfg)
 
         # ---- Eval (test) + per-batch debug ----
         accs_eval = []

@@ -111,7 +111,7 @@ class FrozenRescaledFullyConnected(Adapter):
         b = 1 / 2 * (Cr_m1 / 2 - 1 / Cr_m1)
         return (x * a + b) @ self.W
 
-    def backward(self, x: Array, y: Array, y_hat: Array) -> Self:
+    def backward(self, x: Array, y: Array, y_hat: Array, gate: Array | None) -> Self:
         """Return zero update for all parameters.
 
         Parameters

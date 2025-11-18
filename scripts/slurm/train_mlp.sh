@@ -22,6 +22,6 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training
     --multirun \
     experiment=entangled_mnist_binary_mlp \
     model.kwargs.lr=0.005 \
-    epochs=200 \
-    'wandb.tags=[mlp,square-tanh,BASELINE]' \
-    model.kwargs.loss_type="cross_entropy"
+    epochs=20 \
+    'wandb.tags=[mlp]' \
+    model.kwargs.loss_type="argmax_margin"

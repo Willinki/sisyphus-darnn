@@ -13,7 +13,7 @@ _TRAINER_REGISTRY: Dict[str, Callable] = {
 }
 
 
-def build_trainer(name: str, **kwargs) -> AbstractOrchestrator:
+def build_trainer(name: str, **kwargs):
     """Instantiate a registered model by name."""
     if name not in _TRAINER_REGISTRY:
         raise KeyError(f"Unknown model: {name}")
