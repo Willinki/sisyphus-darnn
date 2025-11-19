@@ -1,0 +1,47 @@
+# @package _global_
+
+defaults:
+  - override /model: fc-baseline-rescale
+  - override /optimizer: sgd
+  - override /data: general_mnist
+  - override /trainer: dynamical_v2
+  - override /wandb: default
+  - override /cluster: cpu
+  - _self_
+
+epochs: 50
+
+optimizer:
+  name: "general_mnist"
+
+data:
+  kwargs:
+    batch_size: 16
+    num_images_per_class:  null
+    x_transform:  sign
+    linear_projection: 100
+    label_mode:  "pm1"
+
+trainer:
+  name: "dynamical_v2"
+  kwargs:
+    warmup_n_iter : 5
+    train_clamped_n_iter : 5
+    train_free_n_iter : 5
+    eval_n_iter : 5
+
+model:
+  name: fc-baseline-rescale
+  kwargs:
+    dim_data: 100
+    dim_hidden: 100
+    num_labels: 10
+    strength_forth: 5.0
+    strength_back: 0.9
+    threshold_in: 1.0
+    threshold_j: 1.0
+    threshold_out: 1.0
+    j_d: 0.5
+
+wandb:
+  tags: ["fc-baseline", "emnist", "dynamical-v2"]

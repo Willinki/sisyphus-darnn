@@ -192,7 +192,7 @@ class StableOutputLayer(Layer):
 
 
 @register_model("fc-baseline-stable-output")
-def build_fc_baseline_stable_output(
+def build_fc_baseline_sparse_feedback(
     seed: int,
     dim_data: int,
     dim_hidden: int,
@@ -201,9 +201,7 @@ def build_fc_baseline_stable_output(
     strength_back: float,
     threshold_in: float,
     threshold_j: float,
-    threshold_out: float,
     j_d: float,
-    j_d_output: float,
 ) -> tuple[SequentialState, SequentialOrchestrator]:
     """Builds the fully connected baseline recurrent model."""
     state = SequentialState((dim_data, dim_hidden, num_labels))

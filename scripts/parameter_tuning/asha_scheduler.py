@@ -49,9 +49,10 @@ def _apply_overrides(cfg: Dict[str, Any], hp: Dict[str, Any]) -> Dict[str, Any]:
     cfg["optimizer"]["learning_rate_j"] = hp["lr_j"]
 
     # 2) optimizer weight decays
-    cfg["optimizer"]["weight_decay_win"] = hp["wd_win"]
-    cfg["optimizer"]["weight_decay_wout"] = hp["wd_wout"]
     cfg["optimizer"]["weight_decay_j"] = hp["wd_j"]
+
+    # 2.1) jd
+    cfg["model"]["kwargs"]["j_d"] = hp["j_d"]
 
     # 3) thresholds (live in model.kwargs in your BASE_CONFIG)
     cfg["model"]["kwargs"]["threshold_in"] = hp["threshold_in"]
@@ -131,7 +132,18 @@ def train_once(
         for b_index, (xb, yb) in enumerate(ds.iter_test()):
             key, metrics = trainer.eval_step(xb, yb, key)
             accs_eval.append(metrics["accuracy"])
+            update_debug_buckets(
+                buckets=buckets,
+                debug_metrics=DEBUG_METRICS,
+                batch_id=b_index,
+                x=xb,
+                y=yb,
+                orchestrator=trainer.orchestrator,
+                state=trainer.state,
+            )
         acc_eval = float(jnp.mean(jnp.array(accs_eval))) if accs_eval else float("nan")
+        aggregated_debug = aggregate_debug_buckets(buckets, DEBUG_METRICS)
+        debug_log = flatten_for_logging(prefix="debug/", aggregated=aggregated_debug)
 
         # Eval (train) for train accuracy
         accs_train = []
@@ -143,7 +155,7 @@ def train_once(
         )
 
         if wb["enabled"]:
-            log_content = {}
+            log_content = debug_log
             if epoch != 0:
                 log_content |= {
                     "accuracy_train": acc_train,
@@ -191,7 +203,7 @@ def run_asha_search() -> None:
         metric="accuracy_eval",
         mode="max",
         max_t=max_epochs,
-        grace_period=20,
+        grace_period=25,
         reduction_factor=3,
     )
 
@@ -202,26 +214,26 @@ def run_asha_search() -> None:
         "lr_wout": tune.loguniform(1e-3, 2e-1),
         "lr_j": tune.loguniform(1e-4, 1e-1),
         # weight decays (explicit grid incl. zero)
-        "wd_win": tune.loguniform(1e-8, 1e-2),
-        "wd_wout": tune.loguniform(1e-8, 1e-2),
         "wd_j": tune.loguniform(1e-8, 1e-2),
         # thresholds (model kwargs)
-        "threshold_in": tune.uniform(0.5, 2.0),
-        "threshold_j": tune.uniform(0.5, 2.0),
-        "threshold_out": tune.uniform(1.0, 5.0),
+        "threshold_in": tune.uniform(0.5, 1.5),
+        "threshold_j": tune.uniform(0.5, 1.5),
+        "threshold_out": tune.uniform(1.0, 4.0),
         # "fields" -> strengths
-        "strength_forth": tune.uniform(1, 5e0),  # around 0.1–5 (covers your 5.0)
-        "strength_back": tune.uniform(5e-1, 2),  # around 0.05–5  (covers your 1.3)
+        "strength_forth": tune.uniform(1, 5e0),
+        "strength_back": tune.uniform(5e-1, 1.5),
+        # jd
+        "j_d": tune.uniform(0.3, 0.9),
     }
 
     tuner = tune.Tuner(
-        tune.with_resources(tune_trainable, resources={"cpu": 7, "gpu": 1}),
+        tune.with_resources(tune_trainable, resources={"cpu": 10, "gpu": 1}),
         tune_config=tune.TuneConfig(
             scheduler=scheduler,
             search_alg=ConcurrencyLimiter(
-                OptunaSearch(metric="accuracy_eval", mode="max"), max_concurrent=10
+                OptunaSearch(metric="accuracy_eval", mode="max"), max_concurrent=1
             ),
-            num_samples=200,  # adjust to your budget
+            num_samples=100,  # adjust to your budget
         ),
         run_config=air.RunConfig(
             name=f"asha_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
@@ -244,9 +256,16 @@ if __name__ == "__main__":
         default=None,
         help="Override BASE_CONFIG['model']['kwargs']['dim_hidden']",
     )
+    parser.add_argument(
+        "--sparsity",
+        type=float,
+        default=None,
+    )
     args = parser.parse_args()
 
     if args.dim_hidden is not None:
         BASE_CONFIG["model"]["kwargs"]["dim_hidden"] = args.dim_hidden
+    if args.sparsity is not None:
+        BASE_CONFIG["model"]["kwargs"]["sparsity"] = args.sparsity
 
     run_asha_search()

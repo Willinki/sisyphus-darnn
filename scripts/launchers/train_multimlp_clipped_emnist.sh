@@ -17,4 +17,4 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.optim=sgd \
     model.kwargs.hidden_dim=512 \
     model.kwargs.kappa=3.0 \
-    model.kwargs.lr=0.002
+    model.kwargs.lr=0.0005

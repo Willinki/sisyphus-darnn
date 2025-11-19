@@ -39,7 +39,7 @@ def main(cfg: DictConfig):
     ds.build(data_key)
 
     # build optimizer (just adam for now)
-    optimizer = optax.adam(learning_rate=cfg.optimizer.learning_rate)
+    optimizer = optax.sgd(learning_rate=cfg.optimizer.learning_rate)
     opt_state = optimizer.init(eqx.filter(orchestrator, eqx.is_inexact_array))
 
     # build trainer

@@ -214,7 +214,7 @@ def summarize_states(values):
 DEBUG_METRICS = {
     "error_class": (misclf_hist_per_batch, misclf_hist_aggregate),
     "overlap_states": (return_internal_states, compute_internal_overlap),
-    "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
+    # "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
     "weights": (get_weights, pass_weights),
     "fields": (get_fields, summarize_fields),
     "data": (get_label, summarize_labels),

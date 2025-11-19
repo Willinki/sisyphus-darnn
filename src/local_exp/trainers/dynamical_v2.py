@@ -157,11 +157,11 @@ class DynamicalTrainerV2(
         )
 
         # computing neuromodulator
-        state_prediction, rng = orchestrator.predict(state, rng=rng)
-        p_s = jax.nn.softmax(state_prediction.readout, axis=-1)
-        neuromodulator = (
-            1 - p_s[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]
-        )  # shape (B,)
+        # state_prediction, rng = orchestrator.predict(state, rng=rng)
+        # p_s = jax.nn.softmax(state_prediction.readout, axis=-1)
+        # neuromodulator = (
+        #    1 - p_s[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]
+        # )  # shape (B,)
 
         # restarting from warmup state
         state = state.replace_val(-1, y)
@@ -181,7 +181,7 @@ class DynamicalTrainerV2(
         )
 
         # 3) local/backprop deltas shaped like orchestrator
-        grads = orchestrator.backward(state, rng=rng, gate=neuromodulator)
+        grads = orchestrator.backward(state, rng=rng)
 
         # 4) filter trainable leaves
         params = eqx.filter(orchestrator, eqx.is_inexact_array)
