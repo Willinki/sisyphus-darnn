@@ -18,4 +18,4 @@ sparsity=${sparsities[$idx]}
 
 echo "Task index: ${idx} -> dim_hidden=256, sparsity=${sparsity}"
 
-uv run python3.11 scripts/parameter_tuning/asha_scheduler.py --dim_hidden 256 --sparsity "${sparsity}"
+uv run python3.11 scripts/parameter_tuning/asha_scheduler.py --dim_hidden 512 --sparsity "${sparsity}"
