@@ -2,7 +2,7 @@ import os
 from typing import Any
 
 BASE_CONFIG: dict[str, Any] = {
-    "epochs": 70,
+    "epochs": 50,
     "optimizer": {
         "learning_rate_wout": 0.005,
         "learning_rate_j": 0.1,

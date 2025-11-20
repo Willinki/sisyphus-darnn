@@ -103,10 +103,13 @@ class SparseRecurrentDiscrete(Layer):
         strength_vec = jnp.asarray(strength, dtype=dtype)
 
         diag = jnp.diag_indices(features)
-        mask = jax.random.bernoulli(key, p=1.0 - sparsity, shape=(features, features))
+        key_j, key_mask = jax.random.split(key)
+        mask = jax.random.bernoulli(
+            key_mask, p=1.0 - sparsity, shape=(features, features)
+        )
         mask = mask.at[diag].set(0)
         J = (
-            jax.random.normal(key, shape=(features, features), dtype=dtype)
+            jax.random.normal(key_j, shape=(features, features), dtype=dtype)
             / jnp.sqrt(features * (1 - sparsity))
             * strength_vec
         )

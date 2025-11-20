@@ -9,7 +9,7 @@ import equinox as eqx
 import optax
 
 from ray import air, tune
-from ray.tune.schedulers import ASHAScheduler
+from ray.tune.schedulers import HyperBandScheduler
 from ray.tune.search import ConcurrencyLimiter
 from ray.tune.search.optuna import OptunaSearch
 
@@ -51,9 +51,6 @@ def _apply_overrides(cfg: Dict[str, Any], hp: Dict[str, Any]) -> Dict[str, Any]:
     # 2) optimizer weight decays
     cfg["optimizer"]["weight_decay_j"] = hp["wd_j"]
 
-    # 2.1) jd
-    cfg["model"]["kwargs"]["j_d"] = hp["j_d"]
-
     # 3) thresholds (live in model.kwargs in your BASE_CONFIG)
     cfg["model"]["kwargs"]["threshold_in"] = hp["threshold_in"]
     cfg["model"]["kwargs"]["threshold_j"] = hp["threshold_j"]
@@ -62,6 +59,8 @@ def _apply_overrides(cfg: Dict[str, Any], hp: Dict[str, Any]) -> Dict[str, Any]:
     # 4) "fields" → strength_forth & strength_back
     cfg["model"]["kwargs"]["strength_forth"] = hp["strength_forth"]
     cfg["model"]["kwargs"]["strength_back"] = hp["strength_back"]
+
+    cfg["model"]["kwargs"]["j_d"] = hp["j_d"]
 
     return cfg
 
@@ -198,12 +197,11 @@ def tune_trainable(hp: Dict[str, Any]) -> None:
 
 def run_asha_search() -> None:
     max_epochs = int(BASE_CONFIG["epochs"])
-    scheduler = ASHAScheduler(
+    scheduler = HyperBandScheduler(
         time_attr="training_iteration",
         metric="accuracy_eval",
         mode="max",
         max_t=max_epochs,
-        grace_period=25,
         reduction_factor=3,
     )
 
@@ -212,7 +210,7 @@ def run_asha_search() -> None:
         # learning rates
         "lr_win": tune.loguniform(1e-3, 2e-1),
         "lr_wout": tune.loguniform(1e-3, 2e-1),
-        "lr_j": tune.loguniform(1e-4, 1e-1),
+        "lr_j": tune.loguniform(1e-4, 2e-1),
         # weight decays (explicit grid incl. zero)
         "wd_j": tune.loguniform(1e-8, 1e-2),
         # thresholds (model kwargs)
@@ -222,12 +220,11 @@ def run_asha_search() -> None:
         # "fields" -> strengths
         "strength_forth": tune.uniform(1, 5e0),
         "strength_back": tune.uniform(5e-1, 1.5),
-        # jd
-        "j_d": tune.uniform(0.3, 0.9),
+        "j_d": tune.uniform(0.1, 1.0),
     }
 
     tuner = tune.Tuner(
-        tune.with_resources(tune_trainable, resources={"cpu": 10, "gpu": 1}),
+        tune.with_resources(tune_trainable, resources={"cpu": 1, "gpu": 0}),
         tune_config=tune.TuneConfig(
             scheduler=scheduler,
             search_alg=ConcurrencyLimiter(
