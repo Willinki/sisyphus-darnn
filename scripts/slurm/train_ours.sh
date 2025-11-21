@@ -20,11 +20,11 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 # Conda
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py \
     --multirun \
-    model.kwargs.dim_hidden=1000 \
+    model.kwargs.dim_hidden=320 \
     epochs=20 \
     'wandb.tags=[ours,sparsity]' \
     model.name=fc-baseline-sparse \
-    +model.kwargs.sparsity=0.99 \
+    +model.kwargs.sparsity=0.9 \
     optimizer.weight_decay_j=0.02 \
     optimizer.learning_rate_j=0.01 \
     model.kwargs.threshold_j=1.4 \
