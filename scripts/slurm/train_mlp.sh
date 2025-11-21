@@ -8,15 +8,15 @@
 #SBATCH --output=train-mlp_%j.out
 #SBATCH --error=train-mlp_%j.err
 
-PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
-mkdir -p "${PROJECT_ROOT}/logs"
-source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
+#PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
+#mkdir -p "${PROJECT_ROOT}/logs"
+#source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
+#
+#module load anaconda3/2024.02
+#source "$(conda info --base)/etc/profile.d/conda.sh"
 
-module load anaconda3/2024.02
-source "$(conda info --base)/etc/profile.d/conda.sh"
-
-# Conda
-conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
+#conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
+uv run python3.11 ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
     --multirun \
     experiment=entangled_mnist_binary_mlp \
     model.kwargs.hidden_dim=100 \
