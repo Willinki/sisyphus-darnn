@@ -23,9 +23,9 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training
     experiment=entangled_mnist_binary_mlp \
     model.kwargs.hidden_dim=100 \
     model.kwargs.lr=0.005 \
-    epochs=50 \
+    epochs=20 \
     'wandb.tags=[mlp,square-tanh]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
-    model.kwargs.loss_type=cross_entropy,argmax_margin \
-    model.kwargs.num_hidden_layers=2,1
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2

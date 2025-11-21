@@ -1,10 +1,10 @@
 #!/bin/bash -e
 #SBATCH --job-name=train-ours
-# #SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=8G
 #SBATCH -t 01:59:00
 #SBATCH --output=logs/train-ours_%j.out
 #SBATCH --error=logs/train-ours_%j.err
@@ -20,12 +20,15 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 # Conda
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py \
     --multirun \
-    model.kwargs.dim_hidden=100 \
-    epochs=50 \
-    'wandb.tags=[ours,jd]' \
-    trainer.kwargs.momentum=0.0 \
-    model.kwargs.j_d=0.7 \
-    trainer.fake_dynamics.enabled=true \
-    trainer.gating.enabled=false \
-    trainer.gating.warmup_epochs=0 \
-    trainer.gating.shift=1.0,1.25,0.75
+    model.kwargs.dim_hidden=1000 \
+    epochs=20 \
+    'wandb.tags=[ours,sparsity]' \
+    model.name=fc-baseline-sparse \
+    +model.kwargs.sparsity=0.99 \
+    optimizer.weight_decay_j=0.02 \
+    optimizer.learning_rate_j=0.01 \
+    model.kwargs.threshold_j=1.4 \
+    model.kwargs.j_d=0.9 \
+    optimizer.learning_rate_win=0.05 \
+    model.kwargs.threshold_in=1.4 \
+    model.kwargs.strength_forth=4.0

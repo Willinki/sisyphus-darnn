@@ -1,4 +1,7 @@
-epochs: 100
+# defaults:
+#   - override hydra/launcher: submitit_slurm
+
+epochs: 20
 
 optimizer:
   learning_rate_wout: 0.05
@@ -21,10 +24,10 @@ trainer:
   name: dynamical
   gating:
     enabled: false
-    warmup_epochs: 1
+    warmup_epochs: 0
     shift: 1.0
   fake_dynamics:
-    enabled: false
+    enabled: true
     k: 0.5 # fraction of spins to set to prototype values
     vanilla: true
   double_dynamics: true
@@ -33,7 +36,7 @@ trainer:
     train_clamped_n_iter: ${trainer.kwargs.eval_n_iter}
     train_free_n_iter: ${trainer.kwargs.eval_n_iter}
     eval_n_iter: 5
-    momentum: 0.9
+    momentum: 0.0
 
 model:
   name: fc-baseline
@@ -47,7 +50,7 @@ model:
     threshold_j: 1.4
     threshold_in: 1.4
     threshold_out: 3.0
-    j_d: 0.5
+    j_d: 0.7
 
 wandb:
   enabled: true
@@ -56,9 +59,7 @@ wandb:
   run_name: "prova"
   mode: online
   tags:
-    - fc-baseline
-    - emnist
-    - dynamical
+    - prova
   dir: /scratch/ms16518/logs/milano/wandb
   save_code: true
   reinit: false
@@ -67,7 +68,7 @@ master_seed: 44
 
 torch_clf:
   enabled: true
-  epochs: 50
+  epochs: 20
   lr: 0.001
   batch_size: 128
   weight_decay: 0.0
