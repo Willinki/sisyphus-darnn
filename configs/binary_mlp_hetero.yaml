@@ -27,7 +27,7 @@ wandb:
   enabled: true
   entity: mattia-scardecchia
   project: darnax-new-benchmarks-v2
-  run_name: ${now:%Y%m%d-%H%M%S}-${model.name}
+  run_name: base-${now:%Y%m%d-%H%M%S}-${model.name}
   mode: online
   dir: ${oc.env:WANDB_DIR,${hydra:runtime.output_dir}}
   tags: ["clipped-mlp", "hetero"]
