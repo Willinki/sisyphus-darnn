@@ -20,7 +20,7 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 # Conda
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp_hetero.py \
     --multirun \
-    model.kwargs.hidden_dim=320 \
+    model.kwargs.hidden_dim=100 \
     model.kwargs.lr=0.005 \
     epochs=20 \
     epochs_readout=20 \
