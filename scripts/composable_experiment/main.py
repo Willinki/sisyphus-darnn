@@ -52,7 +52,8 @@ def train_once(cfg: Dict[str, Any]) -> None:
 
     # build optimizer with map(just adam for now)
     lr_map = make_lr_map_v2(
-        orchestrator, overrides={(1, 0): "w_in", (1, 1): "j", (2, 1): "w_out"}
+        orchestrator,
+        overrides={(1, 0): "w_in", (1, 1): "j", (2, 1): "w_out", (1, 2): "w_back"},
     )
     optimizer = optax.multi_transform(
         {
@@ -62,6 +63,9 @@ def train_once(cfg: Dict[str, Any]) -> None:
             ),
             "w_out": optax.sgd(
                 learning_rate=BASE_CONFIG["optimizer"]["learning_rate_wout"]
+            ),
+            "w_back": optax.sgd(
+                learning_rate=BASE_CONFIG["optimizer"]["learning_rate_wback"]
             ),
             "j": optax.sgd(learning_rate=BASE_CONFIG["optimizer"]["learning_rate_j"]),
         },
@@ -94,6 +98,14 @@ def train_once(cfg: Dict[str, Any]) -> None:
         for b_index, (xb, yb) in enumerate(ds.iter_test()):
             key, metrics = trainer.eval_step(xb, yb, key)
             accs_eval.append(metrics["accuracy"])
+
+        acc_eval = float(jnp.mean(jnp.array(accs_eval))) if accs_eval else float("nan")
+
+        # ---- Eval (train split) for train accuracy (unchanged) ----
+        accs_train = []
+        for b_index, (xb, yb) in enumerate(ds):
+            key, metrics = trainer.eval_step(xb, yb, key)
+            accs_train.append(metrics["accuracy"])
             update_debug_buckets(
                 buckets=buckets,
                 debug_metrics=DEBUG_METRICS,
@@ -103,19 +115,11 @@ def train_once(cfg: Dict[str, Any]) -> None:
                 orchestrator=trainer.orchestrator,
                 state=trainer.state,
             )
-
-        acc_eval = float(jnp.mean(jnp.array(accs_eval))) if accs_eval else float("nan")
-        aggregated_debug = aggregate_debug_buckets(buckets, DEBUG_METRICS)
-        debug_log = flatten_for_logging(prefix="debug/", aggregated=aggregated_debug)
-
-        # ---- Eval (train split) for train accuracy (unchanged) ----
-        accs_train = []
-        for b_index, (xb, yb) in enumerate(ds):
-            key, metrics = trainer.eval_step(xb, yb, key)
-            accs_train.append(metrics["accuracy"])
         acc_train = (
             float(jnp.mean(jnp.array(accs_train))) if accs_train else float("nan")
         )
+        aggregated_debug = aggregate_debug_buckets(buckets, DEBUG_METRICS)
+        debug_log = flatten_for_logging(prefix="debug/", aggregated=aggregated_debug)
 
         if wb.get("enabled", True):
             log_content = debug_log

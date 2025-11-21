@@ -149,6 +149,16 @@ def decay(
     )
     W_out_new = W_out * (1.0 - rescaling_wout)
     new_orch = eqx.tree_at(lambda o: o.lmap[2][1].W, new_orch, W_out_new)
+
+    # W_back
+    W_out = jnp.asarray(new_orch.lmap[1][2].W)
+    rescaling_wout = (
+        config["optimizer"]["weight_decay_wback"]
+        * config["optimizer"]["learning_rate_wback"]
+        / (config["model"]["kwargs"]["num_labels"] ** 0.5)
+    )
+    W_out_new = W_out * (1.0 - rescaling_wout)
+    new_orch = eqx.tree_at(lambda o: o.lmap[1][2].W, new_orch, W_out_new)
     return new_orch
 
 

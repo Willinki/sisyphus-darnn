@@ -92,6 +92,7 @@ class DynamicalTrainerV2(
         super().__init__()
         self.orchestrator = orchestrator
         self.state = state
+        prototypes = self._compute_prototypes(orchestrator)
         self.ctx = {
             "optimizer": optimizer,
             "optimizer_state": optimizer_state,
@@ -99,6 +100,8 @@ class DynamicalTrainerV2(
             "clamped_iter": train_clamped_n_iter,
             "free_iter": train_free_n_iter,
             "eval_iter": eval_n_iter,
+            "threshold_gate": jnp.array(0.0),
+            "prototypes": prototypes,
         }
         self.ctx = self.validate_ctx(self.ctx)
 
@@ -155,13 +158,6 @@ class DynamicalTrainerV2(
             filter_messages="forward",
             skip_output_state=True,
         )
-
-        # computing neuromodulator
-        # state_prediction, rng = orchestrator.predict(state, rng=rng)
-        # p_s = jax.nn.softmax(state_prediction.readout, axis=-1)
-        # neuromodulator = (
-        #    1 - p_s[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]
-        # )  # shape (B,)
 
         # restarting from warmup state
         state = state.replace_val(-1, y)
@@ -267,6 +263,22 @@ class DynamicalTrainerV2(
             state,
             {"accuracy": accuracy},
         )
+
+    @staticmethod
+    def _compute_prototypes(orchestrator: OrchestratorT) -> None:
+        """Precompute class prototypes for neuromodulation.
+
+        Parameters
+        ----------
+        orchestrator : OrchestratorT
+            The current orchestrator/model.
+
+        """
+        num_labels = orchestrator.lmap[2][1].W.shape[1]
+        labels = jnp.zeros((num_labels, num_labels), dtype=jnp.float32) - 1
+        labels = labels.at[jnp.diag_indices(num_labels)].set(1)
+        prototypes = orchestrator.lmap[1][2](labels)  # shape (num_labels, dim_hidden)
+        return prototypes
 
     @staticmethod
     def validate_ctx(ctx: Ctx) -> Ctx:

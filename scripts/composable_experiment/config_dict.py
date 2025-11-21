@@ -2,19 +2,21 @@ import os
 from typing import Any
 
 BASE_CONFIG: dict[str, Any] = {
-    "epochs": 100,
+    "epochs": 10,
     "optimizer": {
         "learning_rate_wout": 0.005,
         "learning_rate_j": 0.1,
         "learning_rate_win": 0.14,
+        "learning_rate_wback": 0.000,
         "weight_decay_win": 0.00,
         "weight_decay_wout": 0.00,
         "weight_decay_j": 0.01,
+        "weight_decay_wback": 0.000,
     },
     "data": {
         "name": "general_mnist",
         "kwargs": {
-            "batch_size": 16,
+            "batch_size": 64,
             "num_images_per_class": None,
             "x_transform": "identity",
             "linear_projection": None,
@@ -37,12 +39,12 @@ BASE_CONFIG: dict[str, Any] = {
             "dim_data": 784,
             "dim_hidden": 128,
             "num_labels": 10,
-            # "sparsity": 0.5,
             "strength_forth": 4.1,
             "strength_back": 0.93,
             "threshold_in": 0.85,
             "threshold_j": 1.01,
             "threshold_out": 1.5,
+            # "threshold_back": 1.5,
             "j_d": 0.5,
         },
     },
@@ -50,7 +52,7 @@ BASE_CONFIG: dict[str, Any] = {
         "enabled": True,
         "entity": "willinki-bocconi-university",
         "project": "darnax-new-benchmarks-v2",
-        "run_name": f"emnist-sparse",
+        "run_name": f"wback-training",
         "mode": "online",
         "tags": ["fc-baseline", "emnist", "dynamical-sparse-feedback"],
         "dir": os.getenv("WANDB_DIR", "./wandb_logs"),

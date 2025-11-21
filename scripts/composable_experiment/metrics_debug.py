@@ -150,6 +150,7 @@ def get_weights(batch_id, x, y, orchestrator, state):
         "J": wandb.Histogram(orchestrator.lmap[1][1].J),
         "W_in": wandb.Histogram(orchestrator.lmap[1][0].W),
         "W_out": wandb.Histogram(orchestrator.lmap[2][1].W),
+        "W_back": wandb.Histogram(orchestrator.lmap[1][2].W),
     }
 
 
@@ -211,12 +212,140 @@ def summarize_states(values):
     return state.mean()
 
 
+#
+# DEBUG METRIC 6: OVERLAP BETWEEN STATE AND PROTOTYPE for correct
+#
+def get_overlaps_between_states_and_prototype(batch_id, x, y, orchestrator, state):
+    orig_state = state
+    y_true = jnp.argmax(y, axis=-1)
+    y_pred = jnp.argmax(orchestrator.lmap[2][1](state[1]), axis=-1)
+    wrong_mask = y_true == y_pred
+
+    prototype = orchestrator.lmap[1][2](y)
+    state_vec = orig_state[-2]
+    cosine_distance = jnp.sum(state_vec * prototype, axis=-1) / (
+        jnp.linalg.norm(state_vec, axis=-1) * jnp.linalg.norm(prototype, axis=-1) + 1e-8
+    )
+
+    return cosine_distance[wrong_mask]
+
+
+def summarize_cosines(values):
+    all_cosines = jnp.concat(values)
+    return wandb.Histogram(all_cosines)
+
+
+#
+# DEBUG METRIC 7: OVERLAP BETWEEN STATE AND PROTOTYPE for wrong
+#
+def get_overlaps_between_states_and_prototype_wrong(
+    batch_id, x, y, orchestrator, state
+):
+    orig_state = state
+    y_true = jnp.argmax(y, axis=-1)
+    y_pred = jnp.argmax(orchestrator.lmap[2][1](state[1]), axis=-1)
+    wrong_mask = y_true != y_pred
+
+    prototype = orchestrator.lmap[1][2](y)
+    state_vec = orig_state[-2]
+    cosine_distance = jnp.sum(state_vec * prototype, axis=-1) / (
+        jnp.linalg.norm(state_vec, axis=-1) * jnp.linalg.norm(prototype, axis=-1) + 1e-8
+    )
+
+    return cosine_distance[wrong_mask]
+
+
+#
+# DEBUG METRIC 6: OVERLAP BETWEEN STATE AND PROTOTYPE for correct during training
+#
+def get_overlaps_between_states_and_prototype_train(
+    batch_id, x, y, orchestrator, state
+):
+    if batch_id % 10 != 0:
+        return None
+    key = jax.random.key(seed=1234 + batch_id)
+    state = state.init(x, y)
+    state, key = orchestrator.step(state, key, filter_messages="forward")
+    for i in range(5):
+        state, key = orchestrator.step(state, key, filter_messages="all")
+    s_star = state[-2]
+    for i in range(5):
+        state, key = orchestrator.step(state, key, filter_messages="forward")
+    prototype = orchestrator.lmap[1][2](y)
+    s_prime = state[-2]
+    cosine_distance = jnp.sum(s_star * prototype, axis=-1) / (
+        jnp.linalg.norm(s_star, axis=-1) * jnp.linalg.norm(s_star, axis=-1) + 1e-8
+    )
+    return cosine_distance
+
+
+def summarize_cosines_filter(values):
+    filtered = [v for v in values if v is not None]
+    if not filtered:
+        return wandb.Histogram([])
+    all_cosines = jnp.concat(filtered)
+    return wandb.Histogram(all_cosines)
+
+
+#
+# DEBUG METRIC: overlap between prototype of correct class - biggest overlap of wrong class
+#
+def get_overlaps_between_states_and_prototype_diff(batch_id, x, y, orchestrator, state):
+    if batch_id % 10 != 0:
+        return None
+    orig_state = state
+    y_true = jnp.argmax(y, axis=-1)
+
+    # computing prototypes manually (sic...)
+    num_labels = orchestrator.lmap[2][1].W.shape[1]
+    labels = jnp.zeros((num_labels, num_labels), dtype=jnp.float32) - 1
+    labels = labels.at[jnp.diag_indices(num_labels)].set(1)
+    prototypes = orchestrator.lmap[1][2](labels)  # shape (num_labels, dim_hidden)
+
+    # computing overlaps
+    state_vec = orig_state[-2]  # (shape (batch_size, dim_hidden))
+    sim_matrix = jnp.dot(state_vec, prototypes.T) / (
+        jnp.linalg.norm(state_vec, axis=-1) * jnp.linalg.norm(prototypes, axis=-1)
+    )  # (shape (batch_size, num_labels))
+    true_class_sim = sim_matrix[
+        jnp.arange(sim_matrix.shape[0]), y_true
+    ]  # shape (batch_size,)
+    mask = jax.nn.one_hot(y_true, prototypes.shape[0], dtype=bool)
+    wrong_class_sim = jnp.where(mask, -jnp.inf, sim_matrix)
+    max_wrong_class_sim = jnp.max(wrong_class_sim, axis=-1)  # shape (batch_size,)
+    return true_class_sim - max_wrong_class_sim
+
+
+def summarize_diff_cosines(values):
+    filtered = [v for v in values if v is not None]
+    if not filtered:
+        return wandb.Histogram([])
+    all_diffs = jnp.concat(filtered)
+    return wandb.Histogram(all_diffs)
+
+
 DEBUG_METRICS = {
     "error_class": (misclf_hist_per_batch, misclf_hist_aggregate),
     "overlap_states": (return_internal_states, compute_internal_overlap),
-    "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
+    # "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
     "weights": (get_weights, pass_weights),
     "fields": (get_fields, summarize_fields),
     "data": (get_label, summarize_labels),
     "final_state": (get_label, summarize_states),
+    # "state_prototype_cosine_correct": (
+    #    get_overlaps_between_states_and_prototype,
+    #    summarize_cosines,
+    # ),
+    # "state_prototype_cosine_wrong": (
+    #    get_overlaps_between_states_and_prototype_wrong,
+    #    summarize_cosines,
+    # ),
+    # "state_prototype_cosine_training": (
+    #    get_overlaps_between_states_and_prototype_train,
+    #    summarize_cosines_filter,
+    # ),
+    "state_overlap_margin": (
+        get_overlaps_between_states_and_prototype_diff,
+        summarize_diff_cosines,
+    ),
 }
