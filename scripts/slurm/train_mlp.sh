@@ -1,14 +1,12 @@
 #!/bin/bash -e
 #SBATCH --job-name=train-mlp
-# #SBATCH --gres=gpu:1
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=32G
-#SBATCH -t 01:59:00
 #SBATCH --output=logs/train-mlp_%j.out
 #SBATCH --error=logs/train-mlp_%j.err
-#SBATCH --comment="preemption=yes;requeue=yes"
 
 PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
 mkdir -p "${PROJECT_ROOT}/logs"
