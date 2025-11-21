@@ -5,8 +5,8 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=32G
-#SBATCH --output=logs/train-mlp_%j.out
-#SBATCH --error=logs/train-mlp_%j.err
+#SBATCH --output=./logs/train-mlp_%j.out
+#SBATCH --error=./logs/train-mlp_%j.err
 
 PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
 mkdir -p "${PROJECT_ROOT}/logs"
