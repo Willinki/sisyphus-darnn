@@ -32,3 +32,4 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py 
     optimizer.learning_rate_win=0.05 \
     model.kwargs.threshold_in=1.4 \
     model.kwargs.strength_forth=4.0
+# parametri scelti in base a H=100, sparsity=0.9
