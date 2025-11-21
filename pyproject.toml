@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "darnax",
-    "jax[cuda12]",
     "datasets>=4.2.0",
     "equinox>=0.12.2",
     "huggingface-hub>=1.1.1",
@@ -24,7 +23,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-darnax = { git = "https://github.com/Willinki/darnax.git" }
+darnax = { git = "https://github.com/Willinki/darnax.git", branch="mattia" }
 local-exp = { workspace = true }
 
 [tool.uv.workspace]
