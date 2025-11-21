@@ -1,25 +1,24 @@
 #!/bin/bash -e
-#SBATCH --job-name=train-hetero
-# #SBATCH --gres=gpu:1
+#SBATCH --job-name=train-mlp
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=32G
-#SBATCH -t 01:59:00
-#SBATCH --output=logs/train-hetero_%j.out
-#SBATCH --error=logs/train-hetero_%j.err
-#SBATCH --comment="preemption=yes;requeue=yes"
+#SBATCH --output=train-mlp_%j.out
+#SBATCH --error=train-mlp_%j.err
 
-PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
-mkdir -p "${PROJECT_ROOT}/logs"
-source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
+#PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
+#mkdir -p "${PROJECT_ROOT}/logs"
+#source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
+#
+#module load anaconda3/2024.02
+#source "$(conda info --base)/etc/profile.d/conda.sh"
 
-module load anaconda3/2024.02
-source "$(conda info --base)/etc/profile.d/conda.sh"
-
-# Conda
-conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp_hetero.py \
+#conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
+uv run python3.11 scripts/python_scripts/training_mlp_hetero.py \
     --multirun \
+    experiment=entangled_mnist_binary_mlp \
     model.kwargs.hidden_dim=100 \
     model.kwargs.lr=0.005 \
     epochs=20 \
