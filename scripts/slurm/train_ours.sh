@@ -10,15 +10,16 @@
 #SBATCH --error=logs/train-ours_%j.err
 #SBATCH --comment="preemption=yes;requeue=yes"
 
-PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
-mkdir -p "${PROJECT_ROOT}/logs"
-source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
-
-module load anaconda3/2024.02
-source "$(conda info --base)/etc/profile.d/conda.sh"
+#PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
+#mkdir -p "${PROJECT_ROOT}/logs"
+#source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
+#
+#module load anaconda3/2024.02
+#source "$(conda info --base)/etc/profile.d/conda.sh"
 
 # Conda
-conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py \
+# conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py \
+uv run python3.11 scripts/python_scripts/main.py \
     --multirun \
     model.kwargs.dim_hidden=320 \
     epochs=20 \
