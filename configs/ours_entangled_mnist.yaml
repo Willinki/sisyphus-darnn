@@ -1,12 +1,12 @@
 epochs: 100
 
 optimizer:
-  learning_rate_wout: 0.1
+  learning_rate_wout: 0.05
   learning_rate_j: 0.005
   learning_rate_win: 0.085
   weight_decay_win: 0.0
-  weight_decay_wout: 0.005
-  weight_decay_j: 0.005
+  weight_decay_wout: 0.0
+  weight_decay_j: 0.01
 
 data:
   name: general_mnist
@@ -19,6 +19,15 @@ data:
 
 trainer:
   name: dynamical
+  gating:
+    enabled: false
+    warmup_epochs: 1
+    shift: 1.0
+  fake_dynamics:
+    enabled: false
+    k: 0.5 # fraction of spins to set to prototype values
+    vanilla: true
+  double_dynamics: true
   kwargs:
     warmup_n_iter: 1
     train_clamped_n_iter: ${trainer.kwargs.eval_n_iter}
@@ -55,3 +64,12 @@ wandb:
   reinit: false
 
 master_seed: 44
+
+torch_clf:
+  enabled: true
+  epochs: 50
+  lr: 0.001
+  batch_size: 128
+  weight_decay: 0.0
+  log_prefix: torch_clf
+  use_bias: false

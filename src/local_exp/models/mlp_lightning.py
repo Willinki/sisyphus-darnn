@@ -446,9 +446,11 @@ def build_clipped_mlp(
     argmax_margin=1.0,
     use_bias=True,
     clamp=True,
+    num_hidden_layers: int = 2,
 ):
+    layer_sizes = [input_dim] + [hidden_dim] * num_hidden_layers + [output_dim]
     model_cfg = ModelConfig(
-        layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
+        layer_sizes=layer_sizes,
         activation_gain=gain,  # Note: unused in MLPClipped, but kept for consistency
         binarize_activations=True,
         dropout=0.0,

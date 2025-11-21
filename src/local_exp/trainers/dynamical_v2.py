@@ -12,6 +12,8 @@ from darnax.states.interface import State
 from darnax.trainers.interface import Trainer
 from darnax.trainers.utils import batch_accuracy, scan_n
 from darnax.utils.typing import PyTree
+import wandb
+import numpy as np
 
 StateT = TypeVar("StateT", bound=State)
 OrchestratorT = TypeVar("OrchestratorT", bound=AbstractOrchestrator[Any])
@@ -156,10 +158,21 @@ class DynamicalTrainerV2(
             skip_output_state=True,
         )
 
-        state_prediction, rng = orchestrator.predict(state, rng=rng)
-        probas = softmax(state_prediction.readout, axis=-1)
-        gate = 1 - probas[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]  # shape (B,)
-        state = state.replace_val(-1, y)
+        # if np.random.rand() < 0.05:
+        #     state_prediction, rng = orchestrator.predict(state, rng=rng)
+        #     probas = softmax(state_prediction.readout, axis=-1)
+        #     gate = (
+        #         1 - probas[jnp.arange(y.shape[0]), jnp.argmax(y, axis=-1)]
+        #     )  # shape (B,)
+        #     state = state.replace_val(-1, y)
+        #     wandb.log(
+        #         {
+        #             "train/gate_mean": jnp.mean(gate),
+        #             "train/gate_min": jnp.min(gate),
+        #             "train/gate_max": jnp.max(gate),
+        #         },
+        #         commit=False,
+        #     )
 
         (state, rng), _ = scan_n(
             orchestrator.step,
@@ -177,8 +190,6 @@ class DynamicalTrainerV2(
         )
 
         # 3) local/backprop deltas shaped like orchestrator
-        # grads = orchestrator.backward(state, rng=rng)
-        grads = orchestrator.backward(state, rng=rng, gate=gate)
 
         # 4) filter trainable leaves
         params = eqx.filter(orchestrator, eqx.is_inexact_array)

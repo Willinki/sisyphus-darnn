@@ -21,6 +21,7 @@ model:
     optim: "sgd"
     use_bias: false
     clamp: true
+    num_hidden_layers: 2
 
 wandb:
   enabled: true

@@ -21,7 +21,11 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
     --multirun \
     experiment=entangled_mnist_binary_mlp \
+    model.kwargs.hidden_dim=100 \
     model.kwargs.lr=0.005 \
-    epochs=20 \
-    'wandb.tags=[mlp]' \
-    model.kwargs.loss_type="argmax_margin"
+    epochs=50 \
+    'wandb.tags=[mlp,square-tanh]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy,argmax_margin \
+    model.kwargs.num_hidden_layers=2,1
