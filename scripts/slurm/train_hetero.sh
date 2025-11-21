@@ -18,13 +18,13 @@
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
 uv run python3.11 scripts/python_scripts/training_mlp_hetero.py \
     --multirun \
-    experiment=entangled_mnist_binary_mlp \
     model.kwargs.hidden_dim=100 \
-    model.kwargs.lr=0.005 \
-    epochs=20 \
-    epochs_readout=20 \
+    model.kwargs.lr=0.025 \
+    epochs=100 \
+    epochs_readout=100 \
     'wandb.tags=[mlp,square-tanh,hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
+    model.kwargs.optim=sgd \
     model.kwargs.loss_type=cross_entropy \
     model.kwargs.num_hidden_layers=2

@@ -53,11 +53,8 @@ def main(cfg: DictConfig):
 
     # ---------- Prepare prototypes and freeze readout ----------
     prototypes = (
-        torch.randint(
-            0, 2, (cfg.model.kwargs.output_dim, cfg.model.kwargs.hidden_dim)
-        ).float()
-        * 2.0
-        - 1.0
+        torch.randn((cfg.model.kwargs.output_dim, cfg.model.kwargs.hidden_dim)).float()
+        / cfg.model.kwargs.output_dim**0.5
     )
     model.model.set_readout_weights(prototypes)
     model.model.toggle_freeze_readout(freeze=True)
@@ -100,6 +97,22 @@ def main(cfg: DictConfig):
 
     # ---------- Unfreeze readout and freeze backbone ----------
     model.model.toggle_freeze_readout(freeze=False)
+
+    # checkin readout
+    # reinit readout weights to random
+    previous_readout = model.model.blocks[-1].weight
+    assert torch.all(
+        torch.isclose(previous_readout - prototypes, torch.zeros_like(previous_readout))
+    )
+    # reinint readout layer
+    model.model.blocks[-1].reset_parameters()
+    assert not torch.any(
+        torch.isclose(
+            model.model.blocks[-1].weight - prototypes,
+            torch.zeros_like(previous_readout),
+        )
+    )
+
     model.model.toggle_freeze_backbone(freeze=True)
 
     # ---------- Train second phase (readout only) ----------

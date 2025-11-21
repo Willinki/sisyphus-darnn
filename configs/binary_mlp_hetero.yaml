@@ -16,7 +16,7 @@ model:
     output_dim: 10
     gain: 1.0 # kept for consistency with other builders
     lr: 1e-3
-    loss_type: "argmax_margin"
+    loss_type: "cross_entropy"
     argmax_margin: 1.0
     optim: "sgd"
     use_bias: false
