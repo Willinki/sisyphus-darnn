@@ -54,8 +54,8 @@ model:
 
 wandb:
   enabled: true
-  entity: mattia-scardecchia
-  project: darnax-new-benchmarks-v2
+  entity: willinki-bocconi-university
+  project: darnax-new-benchmarks-v3
   run_name: "prova"
   mode: online
   tags:

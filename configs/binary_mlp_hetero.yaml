@@ -25,8 +25,8 @@ model:
 
 wandb:
   enabled: true
-  entity: mattia-scardecchia
-  project: darnax-new-benchmarks-v2
+  entity: willinki-bocconi-university
+  project: darnax-new-benchmarks-v3
   run_name: base-${now:%Y%m%d-%H%M%S}-${model.name}
   mode: online
   dir: ${oc.env:WANDB_DIR,${hydra:runtime.output_dir}}
