@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #SBATCH --job-name=train-mlp
-#SBATCH --partition=compute
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
