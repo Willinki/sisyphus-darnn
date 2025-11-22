@@ -22,7 +22,7 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py 
     --multirun \
     model.kwargs.dim_hidden=1000 \
     epochs=20 \
-    'wandb.tags=[ours,sparse-fully,tuning]' \
+    'wandb.tags=[ours,sparse-fully,GOOD]' \
     model.name=fc-baseline-sparse-fully \
     +model.kwargs.sparsity=0.99 \
     +model.kwargs.sparsity_win=0.9 \
