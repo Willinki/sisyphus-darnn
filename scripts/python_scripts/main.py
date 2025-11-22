@@ -335,10 +335,11 @@ def train_once(cfg) -> None:
     lr_win = cfg["optimizer"]["learning_rate_win"]
     lr_wout = cfg["optimizer"]["learning_rate_wout"]
     lr_j = cfg["optimizer"]["learning_rate_j"]
-    if cfg.model.name == "fc-baseline-sparse":
+    if cfg.model.name in ["fc-baseline-sparse", "fc-baseline-sparse-fully"]:
         print("Rescaling learning rates to account for sparsity...")
-        lr_win /= jnp.sqrt(1 - cfg.model.kwargs.sparsity)
         lr_j /= jnp.sqrt(1 - cfg.model.kwargs.sparsity)
+    if cfg.model.name in ["fc-baseline-sparse-fully"]:
+        lr_win /= jnp.sqrt(1 - cfg.model.kwargs.sparsity_win)
     optimizer = optax.multi_transform(
         {
             "default": optax.sgd(learning_rate=0.0),
