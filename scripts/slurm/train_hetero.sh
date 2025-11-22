@@ -24,8 +24,11 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training
     model.kwargs.lr=0.005 \
     epochs=20 \
     epochs_readout=20 \
-    'wandb.tags=[mlp,square-tanh,hetero]' \
+    'wandb.tags=[mlp,square-tanh,hetero,BASELINE]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2
+    model.kwargs.num_hidden_layers=2 \
+    model.prototypes_distro=gaussian \
+    model.reset_readout=true \
+    data.kwargs.batch_size=16

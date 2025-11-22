@@ -1,5 +1,5 @@
-# defaults:
-#   - override hydra/launcher: submitit_slurm
+defaults:
+  - override hydra/launcher: submitit_slurm
 
 epochs: 20
 
@@ -68,9 +68,10 @@ master_seed: 44
 
 torch_clf:
   enabled: true
+  optimizer: sgd
   epochs: 20
-  lr: 0.001
-  batch_size: 128
+  lr: 0.005
+  batch_size: 16
   weight_decay: 0.0
   log_prefix: torch_clf
   use_bias: false

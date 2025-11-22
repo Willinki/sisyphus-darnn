@@ -5,7 +5,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=8G
-#SBATCH -t 01:59:00
+#SBATCH -t 00:45:00
 #SBATCH --output=logs/train-ours_%j.out
 #SBATCH --error=logs/train-ours_%j.err
 #SBATCH --comment="preemption=yes;requeue=yes"
@@ -20,16 +20,17 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 # Conda
 conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py \
     --multirun \
-    model.kwargs.dim_hidden=320 \
+    model.kwargs.dim_hidden=500 \
     epochs=20 \
-    'wandb.tags=[ours,sparsity]' \
+    'wandb.tags=[ours,linear,tuning]' \
     model.name=fc-baseline-sparse \
-    +model.kwargs.sparsity=0.9 \
-    optimizer.weight_decay_j=0.02 \
-    optimizer.learning_rate_j=0.01 \
+    +model.kwargs.sparsity=0.96 \
+    optimizer.weight_decay_j=0.01 \
+    optimizer.learning_rate_j=0.02 \
     model.kwargs.threshold_j=1.4 \
     model.kwargs.j_d=0.9 \
     optimizer.learning_rate_win=0.05 \
     model.kwargs.threshold_in=1.4 \
-    model.kwargs.strength_forth=4.0
-# parametri scelti in base a H=100, sparsity=0.9
+    model.kwargs.strength_forth=4.0 \
+    trainer.fake_dynamics.k=0.5 \
+    torch_clf.lr=0.001,0.002,0.003,0.004,0.005,0.006,0.007 \

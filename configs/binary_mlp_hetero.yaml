@@ -10,6 +10,8 @@ data:
 # Phase 1: prototype-regression MLP (clipped)
 model:
   name: "clipped-3layer-mlp"
+  prototypes_distro: "gaussian"
+  reset_readout: true
   kwargs:
     input_dim: 100
     hidden_dim: 1000
@@ -33,8 +35,8 @@ wandb:
   tags: ["clipped-mlp", "hetero"]
 
 # Global training knobs
-epochs: 25
-epochs_readout: 25
+epochs: 20
+epochs_readout: 20
 
 name: ${model.name}/${data.name}
 master_seed: 44

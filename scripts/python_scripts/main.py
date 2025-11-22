@@ -484,7 +484,9 @@ def train_once(cfg) -> None:
             input_dim, num_classes, bias=cfg.torch_clf.get("use_bias", False)
         ).to(device)
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(
+        opt = torch_clf_cfg.get("optimizer", "adam").lower()
+        opt_class = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}[opt]
+        optimizer = opt_class(
             model.parameters(),
             lr=float(torch_clf_cfg.lr),
             weight_decay=float(torch_clf_cfg.weight_decay),

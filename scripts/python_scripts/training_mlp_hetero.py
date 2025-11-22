@@ -52,13 +52,23 @@ def main(cfg: DictConfig):
     model, _ = build_model(cfg.model.name, **cfg.model.kwargs)
 
     # ---------- Prepare prototypes and freeze readout ----------
-    prototypes = (
-        torch.randint(
-            0, 2, (cfg.model.kwargs.output_dim, cfg.model.kwargs.hidden_dim)
-        ).float()
-        * 2.0
-        - 1.0
-    )
+    prototypes_distro = cfg.model.get("prototypes_distro", "binary")
+    if prototypes_distro == "binary":
+        prototypes = (
+            torch.randint(
+                0, 2, (cfg.model.kwargs.output_dim, cfg.model.kwargs.hidden_dim)
+            ).float()
+            * 2.0
+            - 1.0
+        )
+    elif prototypes_distro == "gaussian":
+        prototypes = torch.randn(
+            cfg.model.kwargs.output_dim, cfg.model.kwargs.hidden_dim
+        )
+    else:
+        raise ValueError(
+            f"Unknown prototypes_distro: {prototypes_distro}. Supported: 'binary', 'gaussian'."
+        )
     model.model.set_readout_weights(prototypes)
     model.model.toggle_freeze_readout(freeze=True)
 
@@ -99,6 +109,11 @@ def main(cfg: DictConfig):
     trainer.fit(model, datamodule=data)
 
     # ---------- Unfreeze readout and freeze backbone ----------
+    if cfg.model.reset_readout:
+        logger.info("Resetting readout layer weights.")
+        assert isinstance(model.model.blocks[-1], torch.nn.Linear)
+        # model.model.set_readout_weights(torch.randn_like(model.model.blocks[-1].weight))
+        model.model.blocks[-1].reset_parameters()
     model.model.toggle_freeze_readout(freeze=False)
     model.model.toggle_freeze_backbone(freeze=True)
 
