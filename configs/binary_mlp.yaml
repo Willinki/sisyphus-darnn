@@ -9,8 +9,6 @@ data:
 
 model:
   name: "clipped-3layer-mlp"
-  prototypes_distro: "gaussian"
-  reset_readout: true
   kwargs:
     input_dim: 100
     hidden_dim: 1000

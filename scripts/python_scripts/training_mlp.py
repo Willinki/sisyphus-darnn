@@ -19,9 +19,7 @@ from local_exp.datasets.registry import build_dataset
 logger = logging.getLogger(__name__)
 
 
-@hydra.main(
-    version_base=None, config_path="../../configs", config_name="base_lightning"
-)
+@hydra.main(version_base=None, config_path="../../configs", config_name="binary_mlp")
 def main(cfg: DictConfig):
     # ---------- logging + config echo ----------
     logger.info(f"Working dir: {os.getcwd()}")
