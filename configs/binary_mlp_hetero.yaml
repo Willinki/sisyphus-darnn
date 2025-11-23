@@ -1,11 +1,15 @@
+defaults:
+  - override hydra/launcher: submitit_slurm
+
 data:
   name: "general_mnist"
+  num_labels: 10
   kwargs:
     batch_size: 64
     num_images_per_class: null
     x_transform: sign
     linear_projection: 100
-    label_mode: "c-rescale"
+    label_mode: "one-hot"
 
 model:
   name: "clipped-3layer-mlp"
@@ -35,7 +39,16 @@ wandb:
 
 # Global training knobs
 epochs: 20
-epochs_readout: 20
 
 name: ${model.name}/${data.name}
 master_seed: 44
+
+torch_clf:
+  enabled: true
+  optimizer: sgd
+  epochs: 20
+  lr: 0.005
+  batch_size: 16
+  weight_decay: 0.0
+  log_prefix: torch_clf
+  use_bias: false

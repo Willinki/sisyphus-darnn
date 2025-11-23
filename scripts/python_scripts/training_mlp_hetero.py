@@ -3,6 +3,7 @@ import os
 import logging
 
 import hydra
+import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
 import torch
@@ -10,6 +11,8 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 import wandb
 
 from local_exp.datasets.jax_to_lightningdata import make_lightning_datamodule_from_jax
@@ -104,67 +107,113 @@ def main(cfg: DictConfig):
         log_every_n_steps=log_every_n_steps,
         val_check_interval=val_check_interval,
     )
-
-    # ---------- Train first phase (backbone only) ----------
     trainer.fit(model, datamodule=data)
 
-    # ---------- Unfreeze readout and freeze backbone ----------
-    if cfg.model.reset_readout:
-        logger.info("Resetting readout layer weights.")
-        assert isinstance(model.model.blocks[-1], torch.nn.Linear)
-        # model.model.set_readout_weights(torch.randn_like(model.model.blocks[-1].weight))
-        model.model.blocks[-1].reset_parameters()
-    model.model.toggle_freeze_readout(freeze=False)
-    model.model.toggle_freeze_backbone(freeze=True)
+    if "torch_clf" in cfg and cfg.torch_clf.get("enabled", False):
+        torch_clf_cfg = cfg.torch_clf
+        print("Starting PyTorch linear classifier training...")
+        # Seed
+        if "master_seed" in cfg:
+            torch.manual_seed(int(cfg.master_seed))
 
-    # ---------- Train second phase (readout only) ----------
-    trainer = pl.Trainer(
-        max_epochs=int(cfg.epochs_readout),
-        accelerator=accelerator,
-        devices=devices,
-        precision=precision,
-        logger=pl_logger,
-        callbacks=[lr_monitor, ckpt_cb],
-        enable_progress_bar=True,
-        log_every_n_steps=log_every_n_steps,
-        val_check_interval=val_check_interval,
-    )
-    trainer.fit(model, datamodule=data)
+        device = model.device
+        model.model.eval()
 
-    # ---------- Save final artifacts locally ----------
-    out_dir = os.getcwd()  # hydra's run dir
-    ckpt_path = os.path.join(out_dir, "final.ckpt")
-    weights_path = os.path.join(out_dir, "model_state_dict.pt")
+        # Feature extraction: TRAIN split
+        train_reps = []
+        train_labels = []
+        for xb, yb in data.train_dataloader():
+            xb_t = xb.to(device)
+            reps = model.model.forward_features(xb_t).detach().cpu()
+            train_reps.append(reps)
+            yb_idx = torch.argmax(yb, dim=-1)
+            train_labels.append(yb_idx.detach().cpu())
 
-    trainer.save_checkpoint(ckpt_path)
-    torch.save(model.state_dict(), weights_path)
+        # Feature extraction: EVAL split
+        test_reps = []
+        test_labels = []
+        test_loader = data.val_dataloader()
+        for xb, yb in test_loader:
+            xb_t = xb.to(device)
+            reps = model.model.forward_features(xb_t).detach().cpu()
+            test_reps.append(reps)
+            yb_idx = torch.argmax(yb, dim=-1)
+            test_labels.append(yb_idx.detach().cpu())
 
-    # ---------- Log as a W&B model artifact ----------
-    try:
-        artifact = wandb.Artifact(
-            name=f"{cfg.model.name}-weights",
-            type="model",
-            description="Final Lightning checkpoint and PyTorch state_dict.",
-            metadata={
-                "model_name": cfg.model.name,
-                "epochs": int(cfg.epochs),
-                "seed": seed,
-                "data_name": cfg.data.name,
-                "trainer": {
-                    "accelerator": accelerator,
-                    "devices": str(devices),
-                    "precision": str(precision),
-                },
-            },
+        features_train = torch.cat(train_reps, dim=0).float()
+        labels_train = torch.cat(train_labels, dim=0).long()
+        features_test = torch.cat(test_reps, dim=0).float()
+        labels_test = torch.cat(test_labels, dim=0).long()
+
+        input_dim = int(features_train.shape[1])
+        num_classes = int(cfg.data.num_labels)
+
+        model = nn.Linear(
+            input_dim, num_classes, bias=cfg.torch_clf.get("use_bias", False)
+        ).to(device)
+        criterion = nn.CrossEntropyLoss()
+        opt = torch_clf_cfg.get("optimizer", "adam").lower()
+        opt_class = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}[opt]
+        optimizer = opt_class(
+            model.parameters(),
+            lr=float(torch_clf_cfg.lr),
+            weight_decay=float(torch_clf_cfg.weight_decay),
         )
-        artifact.add_file(ckpt_path)
-        artifact.add_file(weights_path)
-        run.log_artifact(artifact)
-        logger.info("Uploaded W&B artifact.")
-        os.remove(ckpt_path)
-        os.remove(weights_path)
-    except Exception as e:
-        logger.exception(f"Failed to log W&B artifact: {e}")
+
+        batch_size = int(torch_clf_cfg.batch_size)
+        train_loader = DataLoader(
+            TensorDataset(features_train, labels_train),
+            batch_size=batch_size,
+            shuffle=True,
+        )
+
+        prefix = str(torch_clf_cfg.get("log_prefix", "torch_clf"))
+        epochs_clf = int(torch_clf_cfg.epochs)
+
+        for e in range(epochs_clf):
+            model.train()
+            total_loss = 0.0
+            correct = 0
+            total = 0
+            for xb_t, yb_t in train_loader:
+                xb_t = xb_t.to(device)
+                yb_t = yb_t.to(device)
+                optimizer.zero_grad()
+                logits = model(xb_t)
+                loss = criterion(logits, yb_t)
+                loss.backward()
+                optimizer.step()
+                total_loss += loss.item() * yb_t.size(0)
+                pred = logits.argmax(dim=1)
+                correct += (pred == yb_t).sum().item()
+                total += yb_t.size(0)
+            train_loss = total_loss / max(1, total)
+            train_acc = correct / max(1, total)
+
+            model.eval()
+            with torch.no_grad():
+                logits_eval = model(features_test.to(device))
+                eval_loss = criterion(logits_eval, labels_test.to(device)).item()
+                pred_eval = logits_eval.argmax(dim=1)
+                eval_acc = (pred_eval == labels_test.to(device)).float().mean().item()
+
+            if cfg.wandb.get("enabled", True):
+                wandb.log(
+                    {
+                        f"{prefix}/train_loss": train_loss,
+                        f"{prefix}/train_acc": train_acc,
+                        f"{prefix}/eval_loss": eval_loss,
+                        f"{prefix}/eval_acc": eval_acc,
+                        f"{prefix}/epoch": e,
+                    },
+                    commit=True,
+                )
+
+            print(
+                f"[Torch Clf] Epoch {e:03d} | train_acc={train_acc:.4f} | eval_acc={eval_acc:.4f} | train_loss={train_loss:.4f} | eval_loss={eval_loss:.4f}"
+            )
+
+        print("PyTorch linear classifier training complete.")
 
     # ---------- Finish W&B run (since we created it here) ----------
     wandb.finish()

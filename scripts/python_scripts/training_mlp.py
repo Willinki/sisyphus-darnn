@@ -83,41 +83,6 @@ def main(cfg: DictConfig):
     # ---------- Train ----------
     trainer.fit(model, datamodule=data)
 
-    # ---------- Save final artifacts locally ----------
-    out_dir = os.getcwd()  # hydra's run dir
-    ckpt_path = os.path.join(out_dir, "final.ckpt")
-    weights_path = os.path.join(out_dir, "model_state_dict.pt")
-
-    trainer.save_checkpoint(ckpt_path)
-    torch.save(model.state_dict(), weights_path)
-
-    # ---------- Log as a W&B model artifact ----------
-    try:
-        artifact = wandb.Artifact(
-            name=f"{cfg.model.name}-weights",
-            type="model",
-            description="Final Lightning checkpoint and PyTorch state_dict.",
-            metadata={
-                "model_name": cfg.model.name,
-                "epochs": int(cfg.epochs),
-                "seed": seed,
-                "data_name": cfg.data.name,
-                "trainer": {
-                    "accelerator": accelerator,
-                    "devices": str(devices),
-                    "precision": str(precision),
-                },
-            },
-        )
-        artifact.add_file(ckpt_path)
-        artifact.add_file(weights_path)
-        run.log_artifact(artifact)
-        logger.info("Uploaded W&B artifact.")
-        os.remove(ckpt_path)
-        os.remove(weights_path)
-    except Exception as e:
-        logger.exception(f"Failed to log W&B artifact: {e}")
-
     # ---------- Finish W&B run (since we created it here) ----------
     wandb.finish()
 

@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/launcher: submitit_slurm
+
 data:
   name: "general_mnist"
   kwargs:
@@ -5,7 +8,7 @@ data:
     num_images_per_class: null
     x_transform: sign
     linear_projection: 100
-    label_mode: "c-rescale"
+    label_mode: "one-hot"
 
 model:
   name: "clipped-3layer-mlp"
