@@ -5,6 +5,7 @@ from jax import Array
 import jax.numpy as jnp
 from jax.typing import ArrayLike, DTypeLike
 import equinox as eqx
+
 from darnax.layer_maps.sparse import LayerMap
 from darnax.modules.interfaces import Layer
 from darnax.modules.fully_connected import FullyConnected, FrozenFullyConnected
@@ -339,7 +340,7 @@ def build_fc_baseline_sparse(
                 threshold=threshold_j,
                 key=keys[1],
             ),
-            2: FrozenFullyConnected(
+            2: FrozenRescaledFullyConnected(
                 in_features=num_labels,
                 out_features=dim_hidden,
                 strength=strength_back,
@@ -403,7 +404,7 @@ def build_fc_baseline_sparse_fully(
                 threshold=threshold_j,
                 key=keys[1],
             ),
-            2: FrozenFullyConnected(
+            2: FrozenRescaledFullyConnected(
                 in_features=num_labels,
                 out_features=dim_hidden,
                 strength=strength_back,
