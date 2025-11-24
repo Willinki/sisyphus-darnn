@@ -58,7 +58,7 @@ wandb:
   enabled: true
   entity: willinki-bocconi-university
   project: darnax-new-benchmarks-v3
-  run_name: "prova-sparsity"
+  run_name: "tune-sparse-mnsit"
   mode: online
   tags:
     - prova
