@@ -8,7 +8,7 @@ data:
     num_images_per_class: null
     x_transform: sign
     linear_projection: 100
-    label_mode: "one-hot"
+    label_mode: "ooe"
 
 model:
   name: "clipped-3layer-mlp"

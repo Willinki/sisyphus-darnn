@@ -4,11 +4,11 @@ defaults:
 epochs: 20
 
 optimizer:
-  learning_rate_wout: 0.05
-  learning_rate_j: 0.005
-  learning_rate_win: 0.085
+  learning_rate_wout: 0.025
+  learning_rate_j: 0.02
+  learning_rate_win: 0.3
   weight_decay_win: 0.0
-  weight_decay_wout: 0.0
+  weight_decay_wout: 0.02
   weight_decay_j: 0.01
 
 data:
@@ -18,7 +18,7 @@ data:
     num_images_per_class: null
     x_transform: sign
     linear_projection: 100
-    label_mode: c-rescale
+    label_mode: pm1
 
 trainer:
   name: dynamical
@@ -27,7 +27,7 @@ trainer:
     warmup_epochs: 0
     shift: 1.0
   fake_dynamics:
-    enabled: true
+    enabled: false
     k: 0.5 # fraction of spins to set to prototype values
     vanilla: true
   double_dynamics: true
@@ -39,18 +39,20 @@ trainer:
     momentum: 0.0
 
 model:
-  name: fc-baseline
+  name: fc-baseline-sparse-fully
   kwargs:
     seed: 99
     dim_data: 100
     dim_hidden: 100
     num_labels: 10
     strength_forth: 5.0
-    strength_back: 1.4
+    strength_back: 2.75
     threshold_j: 1.4
-    threshold_in: 1.4
-    threshold_out: 3.0
-    j_d: 0.7
+    threshold_in: 1.6
+    threshold_out: 7.0
+    j_d: 0.9
+    sparsity: 0.99
+    sparsity_win: 0.9
 
 wandb:
   enabled: true

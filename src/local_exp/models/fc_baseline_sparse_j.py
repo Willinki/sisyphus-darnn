@@ -7,7 +7,7 @@ from jax.typing import ArrayLike, DTypeLike
 import equinox as eqx
 from darnax.layer_maps.sparse import LayerMap
 from darnax.modules.interfaces import Layer
-from darnax.modules.fully_connected import FullyConnected, FrozenFullyConnected
+from darnax.modules.fully_connected import FullyConnected, FrozenFullyConnected, Wback
 from darnax.orchestrators.sequential import SequentialOrchestrator
 from darnax.states.sequential import SequentialState
 from darnax.modules.input_output import OutputLayer
@@ -403,7 +403,7 @@ def build_fc_baseline_sparse_fully(
                 threshold=threshold_j,
                 key=keys[1],
             ),
-            2: FrozenFullyConnected(
+            2: Wback(
                 in_features=num_labels,
                 out_features=dim_hidden,
                 strength=strength_back,
