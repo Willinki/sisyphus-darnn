@@ -20,6 +20,43 @@ KeyArray = Array
 PyTree = Any
 
 
+class SparseFullyConnected(FullyConnected):
+    _mask: Array
+
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        strength: float | ArrayLike,
+        threshold: float | ArrayLike,
+        sparsity: float,
+        key: Array,
+        dtype: DTypeLike = jnp.float32,
+    ):
+        self.strength = self._set_shape(strength, out_features, dtype)
+        self.threshold = self._set_shape(threshold, out_features, dtype)
+        key_w, key_mask = jax.random.split(key)
+        mask = jax.random.bernoulli(
+            key_mask, p=1.0 - sparsity, shape=(in_features, out_features)
+        )
+        W = (
+            jax.random.normal(key_w, shape=(in_features, out_features), dtype=dtype)
+            * self.strength
+            / jnp.sqrt(in_features * (1 - sparsity))
+        )
+        self._mask = mask
+        self.W = W * mask
+
+    def backward(
+        self, x: Array, y: Array, y_hat: Array, gate: Array | None = None
+    ) -> Self:
+        dW = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
+        dW = dW * self._mask
+        zero_update = jax.tree.map(jnp.zeros_like, self)
+        new_self: Self = eqx.tree_at(lambda m: m.W, zero_update, dW)
+        return new_self
+
+
 class SparseRecurrentDiscrete(Layer):
     """Binary (±1) recurrent layer with SPARSE couplings.
 
@@ -226,7 +263,7 @@ class SparseRecurrentDiscrete(Layer):
         >>> new_params = eqx.tree_at(lambda m: m.J, layer, layer.J + lr * upd.J)
 
         """
-        dJ = perceptron_rule_backward(x, y, y_hat, self.threshold)
+        dJ = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
         dJ = dJ * self._mask
         zero_update = jax.tree.map(jnp.zeros_like, self)
         new_self: Self = eqx.tree_at(lambda m: m.J, zero_update, dJ)
@@ -293,6 +330,70 @@ def build_fc_baseline_sparse(
                 out_features=dim_hidden,
                 strength=strength_forth,
                 threshold=threshold_in,
+                key=keys[0],
+            ),
+            1: SparseRecurrentDiscrete(
+                features=dim_hidden,
+                j_d=j_d,
+                sparsity=sparsity,
+                threshold=threshold_j,
+                key=keys[1],
+            ),
+            2: FrozenFullyConnected(
+                in_features=num_labels,
+                out_features=dim_hidden,
+                strength=strength_back,
+                threshold=0.0,
+                key=keys[2],
+            ),
+        },
+        2: {
+            1: FullyConnected(
+                in_features=dim_hidden,
+                out_features=num_labels,
+                strength=1.0,
+                threshold=threshold_out,
+                key=keys[3],
+            ),
+            2: OutputLayer(),
+        },
+    }
+
+    layer_map = LayerMap.from_dict(layer_map)
+    orchestrator = SequentialOrchestrator(layers=layer_map)
+
+    return state, orchestrator
+
+
+@register_model("fc-baseline-sparse-fully")
+def build_fc_baseline_sparse_fully(
+    seed: int,
+    dim_data: int,
+    dim_hidden: int,
+    sparsity: float,
+    sparsity_win: float,
+    num_labels: int,
+    strength_forth: float,
+    strength_back: float,
+    threshold_in: float,
+    threshold_out: float,
+    threshold_j: float,
+    j_d: float,
+) -> tuple[SequentialState, SequentialOrchestrator]:
+    """Builds the fully connected baseline recurrent model."""
+    state = SequentialState((dim_data, dim_hidden, num_labels))
+
+    master_key = jax.random.key(seed)
+    keys = jax.random.split(master_key, num=5)
+
+    layer_map = {
+        1: {
+            0: SparseFullyConnected(
+                in_features=dim_data,
+                out_features=dim_hidden,
+                strength=strength_forth,
+                threshold=threshold_in,
+                sparsity=sparsity_win,
                 key=keys[0],
             ),
             1: SparseRecurrentDiscrete(
