@@ -8,7 +8,7 @@
 #SBATCH --partition=gpu
 #SBATCH --output=mnist-sparse_%A_%a.out
 #SBATCH --error=mnist-sparse_%A_%a.err
-#SBATCH --array=0-1727%4 this_script.sh
+#SBATCH --array=0-1727%4
 
 # ----------------------------------------------
 # Parameter grids (edit values as needed)
