@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-darnax = { git = "https://github.com/Willinki/darnax.git", branch="mattia" }
+darnax = { git = "https://github.com/Willinki/darnax.git", branch="mattia-variations" }
 local-exp = { workspace = true }
 
 [tool.uv.workspace]
