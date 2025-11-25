@@ -4,7 +4,7 @@ import logging
 import time
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 import equinox as eqx
 import hydra
@@ -233,13 +233,13 @@ def summarize_states(values):
 
 
 DEBUG_METRICS = {
-    "error_class": (misclf_hist_per_batch, misclf_hist_aggregate),
+    # "error_class": (misclf_hist_per_batch, misclf_hist_aggregate),
     "overlap_states": (return_internal_states, compute_internal_overlap),
-    "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
+    # "overlap_figures": (return_internal_states, compute_internal_overlap_heatmap),
     "weights": (get_weights, pass_weights),
     "fields": (get_fields, summarize_fields),
-    "data": (get_label, summarize_labels),
-    "final_state": (get_label, summarize_states),
+    # "data": (get_label, summarize_labels),
+    # "final_state": (get_label, summarize_states),
 }
 
 
@@ -404,10 +404,18 @@ def train_once(cfg) -> None:
 
         # ---- Eval (test) + per-batch debug ----
         accs_eval = []
-        buckets = init_debug_buckets(DEBUG_METRICS)
         for b_index, (xb, yb) in enumerate(ds.iter_test()):
             key, metrics = trainer.eval_step(xb, yb, key)
             accs_eval.append(metrics["accuracy"])
+
+        acc_eval = float(jnp.mean(jnp.array(accs_eval))) if accs_eval else float("nan")
+
+        # ---- Eval (train split) for train accuracy (unchanged) ----
+        accs_train = []
+        buckets = init_debug_buckets(DEBUG_METRICS)
+        for b_index, (xb, yb) in enumerate(ds):
+            key, metrics = trainer.eval_step(xb, yb, key)
+            accs_train.append(metrics["accuracy"])
             update_debug_buckets(
                 buckets=buckets,
                 debug_metrics=DEBUG_METRICS,
@@ -417,19 +425,11 @@ def train_once(cfg) -> None:
                 orchestrator=trainer.orchestrator,
                 state=trainer.state,
             )
-
-        acc_eval = float(jnp.mean(jnp.array(accs_eval))) if accs_eval else float("nan")
-        aggregated_debug = aggregate_debug_buckets(buckets, DEBUG_METRICS)
-        debug_log = flatten_for_logging(prefix="debug/", aggregated=aggregated_debug)
-
-        # ---- Eval (train split) for train accuracy (unchanged) ----
-        accs_train = []
-        for b_index, (xb, yb) in enumerate(ds):
-            key, metrics = trainer.eval_step(xb, yb, key)
-            accs_train.append(metrics["accuracy"])
         acc_train = (
             float(jnp.mean(jnp.array(accs_train))) if accs_train else float("nan")
         )
+        aggregated_debug = aggregate_debug_buckets(buckets, DEBUG_METRICS)
+        debug_log = flatten_for_logging(prefix="debug/", aggregated=aggregated_debug)
 
         if wb.get("enabled", True):
             log_content = debug_log
