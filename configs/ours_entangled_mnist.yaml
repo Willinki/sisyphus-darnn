@@ -7,9 +7,11 @@ optimizer:
   learning_rate_wout: 0.025
   learning_rate_j: 0.02
   learning_rate_win: 0.3
+  learning_rate_wback: 0.0
   weight_decay_win: 0.0
   weight_decay_wout: 0.02
   weight_decay_j: 0.01
+  weight_decay_wback: 0.0
 
 data:
   name: general_mnist
@@ -50,10 +52,12 @@ model:
     threshold_j: 1.4
     threshold_in: 1.6
     threshold_out: 7.0
+    threshold_back: 0.0
     j_d: 0.9
     sparsity: 0.99
     sparsity_win: 0.9
     use_crossentropy: false
+    learnable_wback: false
 
 wandb:
   enabled: true

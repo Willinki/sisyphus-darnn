@@ -330,11 +330,17 @@ def train_once(cfg) -> None:
     ds.build(data_key)
 
     lr_map = make_lr_map_v2(
-        orchestrator, overrides={(1, 0): "w_in", (1, 1): "j", (2, 1): "w_out"}
+        orchestrator,
+        overrides={(1, 0): "w_in", (1, 1): "j", (2, 1): "w_out", (1, 2): "w_back"},
     )
     lr_win = cfg["optimizer"]["learning_rate_win"]
     lr_wout = cfg["optimizer"]["learning_rate_wout"]
     lr_j = cfg["optimizer"]["learning_rate_j"]
+    lr_wback = (
+        0.0
+        if not cfg.model.kwargs.learnable_wback
+        else cfg["optimizer"]["learning_rate_wback"]
+    )
     if cfg.model.name in ["fc-baseline-sparse", "fc-baseline-sparse-fully"]:
         print("Rescaling learning rates to account for sparsity...")
         lr_j /= jnp.sqrt(1 - cfg.model.kwargs.sparsity)
@@ -346,6 +352,7 @@ def train_once(cfg) -> None:
             "w_in": optax.sgd(learning_rate=lr_win),
             "w_out": optax.sgd(learning_rate=lr_wout),
             "j": optax.sgd(learning_rate=lr_j),
+            "w_back": optax.sgd(learning_rate=lr_wback),
         },
         lr_map,
     )

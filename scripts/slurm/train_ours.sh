@@ -22,4 +22,4 @@ conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/main.py 
     --multirun \
     model.kwargs.dim_hidden=1000 \
     epochs=5 \
-    'wandb.tags=[ours]' \
+    'wandb.tags=[ours,emnist]'

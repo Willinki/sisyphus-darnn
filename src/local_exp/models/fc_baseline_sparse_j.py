@@ -382,9 +382,11 @@ def build_fc_baseline_sparse_fully(
     strength_back: float,
     threshold_in: float,
     threshold_out: float,
+    threshold_back: float,
     threshold_j: float,
     j_d: float,
     use_crossentropy: bool,
+    learnable_wback: bool,
 ) -> tuple[SequentialState, SequentialOrchestrator]:
     """Builds the fully connected baseline recurrent model."""
     state = SequentialState((dim_data, dim_hidden, num_labels))
@@ -413,8 +415,9 @@ def build_fc_baseline_sparse_fully(
                 in_features=num_labels,
                 out_features=dim_hidden,
                 strength=strength_back,
-                threshold=0.0,
+                threshold=threshold_back,
                 key=keys[2],
+                learnable=learnable_wback,
             ),
         },
         2: {
