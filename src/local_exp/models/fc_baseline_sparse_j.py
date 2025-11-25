@@ -8,7 +8,12 @@ import equinox as eqx
 
 from darnax.layer_maps.sparse import LayerMap
 from darnax.modules.interfaces import Layer
-from darnax.modules.fully_connected import FullyConnected, FrozenFullyConnected
+from darnax.modules.fully_connected import (
+    FullyConnected,
+    FrozenFullyConnected,
+    Wback,
+    Wout,
+)
 from darnax.orchestrators.sequential import SequentialOrchestrator
 from darnax.states.sequential import SequentialState
 from darnax.modules.input_output import OutputLayer
@@ -419,6 +424,75 @@ def build_fc_baseline_sparse_fully(
                 strength=1.0,
                 threshold=threshold_out,
                 key=keys[3],
+            ),
+            2: OutputLayer(),
+        },
+    }
+
+    layer_map = LayerMap.from_dict(layer_map)
+    orchestrator = SequentialOrchestrator(layers=layer_map)
+
+    return state, orchestrator
+
+
+@register_model("fc-baseline-sparse-fully")
+def build_fc_baseline_sparse_fully(
+    seed: int,
+    dim_data: int,
+    dim_hidden: int,
+    sparsity: float,
+    sparsity_win: float,
+    num_labels: int,
+    strength_forth: float,
+    strength_back: float,
+    threshold_in: float,
+    threshold_out: float,
+    threshold_back: float,
+    threshold_j: float,
+    j_d: float,
+    use_crossentropy: bool,
+    learnable_wback: bool,
+) -> tuple[SequentialState, SequentialOrchestrator]:
+    """Builds the fully connected baseline recurrent model."""
+    state = SequentialState((dim_data, dim_hidden, num_labels))
+
+    master_key = jax.random.key(seed)
+    keys = jax.random.split(master_key, num=5)
+
+    layer_map = {
+        1: {
+            0: SparseFullyConnected(
+                in_features=dim_data,
+                out_features=dim_hidden,
+                strength=strength_forth,
+                threshold=threshold_in,
+                sparsity=sparsity_win,
+                key=keys[0],
+            ),
+            1: SparseRecurrentDiscrete(
+                features=dim_hidden,
+                j_d=j_d,
+                sparsity=sparsity,
+                threshold=threshold_j,
+                key=keys[1],
+            ),
+            2: Wback(
+                in_features=num_labels,
+                out_features=dim_hidden,
+                strength=strength_back,
+                threshold=threshold_back,
+                key=keys[2],
+                learnable=learnable_wback,
+            ),
+        },
+        2: {
+            1: Wout(
+                in_features=dim_hidden,
+                out_features=num_labels,
+                strength=1.0,
+                threshold=threshold_out,
+                key=keys[3],
+                use_crossentropy=use_crossentropy,
             ),
             2: OutputLayer(),
         },

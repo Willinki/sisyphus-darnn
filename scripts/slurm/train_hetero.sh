@@ -8,23 +8,18 @@
 #SBATCH --output=train-mlp_%j.out
 #SBATCH --error=train-mlp_%j.err
 
-#PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
-#mkdir -p "${PROJECT_ROOT}/logs"
-#source "${PROJECT_ROOT}/scripts/slurm/constants.sh"
-#
-#module load anaconda3/2024.02
-#source "$(conda info --base)/etc/profile.d/conda.sh"
-
-#conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
+# Conda
 uv run python3.11 scripts/python_scripts/training_mlp_hetero.py \
     --multirun \
-    model.kwargs.hidden_dim=100 \
-    model.kwargs.lr=0.025 \
-    epochs=100 \
-    epochs_readout=100 \
-    'wandb.tags=[mlp,square-tanh,hetero]' \
+    model.kwargs.hidden_dim=100,200,300,400,500,600 \
+    model.kwargs.lr=0.003 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,emnist,hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.optim=sgd \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2
+    model.kwargs.num_hidden_layers=2 \
+    model.prototypes_distro=gaussian \
+    model.reset_readout=true \
+    data.kwargs.batch_size=16

@@ -182,7 +182,7 @@ class MLPClipped(nn.Module):
         return self.net(x)
 
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:
-        """Final hidden layer (before last LinearClipped)."""
+        """Final hidden layer (before last Linear)"""
         layers = list(self.net.children())
         for layer in layers[:-1]:
             x = layer(x)

@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/launcher: submitit_slurm
+
 data:
   name: "general_mnist"
   kwargs:
@@ -5,24 +8,22 @@ data:
     num_images_per_class: null
     x_transform: sign
     linear_projection: 100
-    label_mode: "c-rescale"
+    label_mode: "ooe"
 
-# Phase 1: prototype-regression MLP (clipped)
 model:
-  name: "clipped-3layer-mlp-prototypes"
+  name: "clipped-3layer-mlp"
   kwargs:
     input_dim: 100
     hidden_dim: 1000
     output_dim: 10
     gain: 1.0 # kept for consistency with other builders
     lr: 1e-3
+    loss_type: "argmax_margin"
+    argmax_margin: 1.0
     optim: "sgd"
-    use_bias: true
-
-# Phase 2: perceptron on frozen features
-perceptron:
-  margin: 3.0 # perceptron margin γ
-  lr: 0.05 # perceptron step size η
+    use_bias: false
+    clamp: true
+    num_hidden_layers: 2
 
 wandb:
   enabled: true
@@ -34,8 +35,8 @@ wandb:
   tags: ["clipped-mlp", "hetero"]
 
 # Global training knobs
-epochs_phase1: 200
-epochs_phase2: 25
+epochs: 20
+epochs_readout: 20
 
 name: ${model.name}/${data.name}
 master_seed: 44

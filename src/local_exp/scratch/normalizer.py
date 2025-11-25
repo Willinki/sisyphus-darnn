@@ -117,9 +117,14 @@ def decay(
     Any
         A new orchestrator with decayed weights.
     """
+    # NOTE: here, we are using config value of learning rate; however, with sparsity, this is not the actual lr used.
+    # This is not a bug, but it makes interpreting the weight decay harder...
+    # NOTE: compared with the old codebase, we are not scaling the weight decay coefficient by the magnitude of the weights at init,
+    # again because we read from config (e.g. strength_back, strength_in).
     new_orch = orchestrator
 
     # W_in
+    # NOTE: with sparsity, here we also have a mask like for J. However, zero entries remain zero after decay, so we can skip it.
     W_in = jnp.asarray(new_orch.lmap[1][0].W)
     rescaling_win = (
         config["optimizer"]["weight_decay_win"]
@@ -149,6 +154,19 @@ def decay(
     )
     W_out_new = W_out * (1.0 - rescaling_wout)
     new_orch = eqx.tree_at(lambda o: o.lmap[2][1].W, new_orch, W_out_new)
+
+    # W_back
+    if config["model"]["kwargs"]["learnable_wback"]:
+        # this would be a no-op otherwise, since lr is zero
+        W_back = jnp.asarray(new_orch.lmap[1][2].W)
+        rescaling_wback = (
+            config["optimizer"]["weight_decay_wback"]
+            * config["optimizer"]["learning_rate_wback"]
+            / (config["model"]["kwargs"]["num_labels"] ** 0.5)
+        )
+        W_back_new = W_back * (1.0 - rescaling_wback)
+        new_orch = eqx.tree_at(lambda o: o.lmap[1][2].W, new_orch, W_back_new)
+
     return new_orch
 
 
