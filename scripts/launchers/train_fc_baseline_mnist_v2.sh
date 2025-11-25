@@ -4,6 +4,8 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=1000 \
     epochs=20 \
     'wandb.tags=[ours,mnist,tuning]' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
     model.name=fc-baseline-sparse-fully \
     model.kwargs.sparsity=0.99 \
     model.kwargs.sparsity_win=0.9 \
