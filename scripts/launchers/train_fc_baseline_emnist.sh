@@ -5,8 +5,8 @@ uv run python scripts/python_scripts/main.py \
     epochs=5 \
     'wandb.tags=[ours,emnist]' \
     model.name=fc-baseline-sparse-fully \
-    +model.kwargs.sparsity=0.99 \
-    +model.kwargs.sparsity_win=0.9 \
+    model.kwargs.sparsity=0.99 \
+    model.kwargs.sparsity_win=0.9 \
     optimizer.weight_decay_j=0.01 \
     optimizer.learning_rate_j=0.02 \
     model.kwargs.threshold_j=1.4 \
