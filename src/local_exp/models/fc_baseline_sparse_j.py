@@ -7,7 +7,12 @@ from jax.typing import ArrayLike, DTypeLike
 import equinox as eqx
 from darnax.layer_maps.sparse import LayerMap
 from darnax.modules.interfaces import Layer
-from darnax.modules.fully_connected import FullyConnected, FrozenFullyConnected, Wback
+from darnax.modules.fully_connected import (
+    FullyConnected,
+    FrozenFullyConnected,
+    Wback,
+    Wout,
+)
 from darnax.orchestrators.sequential import SequentialOrchestrator
 from darnax.states.sequential import SequentialState
 from darnax.modules.input_output import OutputLayer
@@ -379,6 +384,7 @@ def build_fc_baseline_sparse_fully(
     threshold_out: float,
     threshold_j: float,
     j_d: float,
+    use_crossentropy: bool,
 ) -> tuple[SequentialState, SequentialOrchestrator]:
     """Builds the fully connected baseline recurrent model."""
     state = SequentialState((dim_data, dim_hidden, num_labels))
@@ -412,12 +418,13 @@ def build_fc_baseline_sparse_fully(
             ),
         },
         2: {
-            1: FullyConnected(
+            1: Wout(
                 in_features=dim_hidden,
                 out_features=num_labels,
                 strength=1.0,
                 threshold=threshold_out,
                 key=keys[3],
+                use_crossentropy=use_crossentropy,
             ),
             2: OutputLayer(),
         },

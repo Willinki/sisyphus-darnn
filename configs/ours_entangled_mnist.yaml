@@ -53,6 +53,7 @@ model:
     j_d: 0.9
     sparsity: 0.99
     sparsity_win: 0.9
+    use_crossentropy: false
 
 wandb:
   enabled: true
