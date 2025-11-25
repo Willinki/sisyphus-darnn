@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-python scripts/python_scripts/main.py \
+uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=1000 \
     epochs=5 \
     'wandb.tags=[ours,emnist]' \
