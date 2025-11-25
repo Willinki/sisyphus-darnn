@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "darnax",
+    "darnax[cuda12]",
     "datasets>=4.2.0",
     "equinox>=0.12.2",
     "huggingface-hub>=1.1.1",
