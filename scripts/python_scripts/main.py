@@ -376,12 +376,11 @@ def train_once(cfg) -> None:
         # ---- Train ----
         if epoch != 0:
             count = 0
-            avg_logs = defaultdict(float)
             for xb, yb in ds:
                 use_gating = cfg.trainer.gating.enabled and (
                     epoch > cfg.trainer.gating.warmup_epochs
                 )
-                key, logs = trainer.train_step(
+                key = trainer.train_step(
                     xb,
                     yb,
                     key,
@@ -395,12 +394,6 @@ def train_once(cfg) -> None:
                 trainer.orchestrator = decay(trainer.orchestrator, cfg)
 
                 count += 1
-                for k, v in logs.items():
-                    avg_logs[k] += v
-            for k in avg_logs:
-                avg_logs[k] /= count
-            if wb.get("enabled", True):
-                wandb.log(avg_logs, step=epoch, commit=False)
 
         # ---- Eval (test) + per-batch debug ----
         accs_eval = []
