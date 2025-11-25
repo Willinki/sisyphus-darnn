@@ -10,8 +10,10 @@
 
 # Conda
 uv run python3.11 scripts/python_scripts/training_mlp_hetero.py \
-    --multirun \
-    model.kwargs.hidden_dim=100,200,300,400,500,600 \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.hidden_dim=100 \
+    model.kwargs.input_dim=784 \
     model.kwargs.lr=0.003 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,hetero]' \
