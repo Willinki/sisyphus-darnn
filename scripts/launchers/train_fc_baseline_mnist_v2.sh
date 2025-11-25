@@ -7,6 +7,7 @@ uv run python scripts/python_scripts/main.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.name=fc-baseline-sparse-fully \
+    model.kwargs.dim_data=784 \
     model.kwargs.sparsity=0.99 \
     model.kwargs.sparsity_win=0.9 \
     model.kwargs.threshold_j=1.4 \
