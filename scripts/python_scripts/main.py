@@ -313,18 +313,18 @@ def train_once(cfg) -> None:
 
     print("initialized wandb")
     state, orchestrator = build_model(cfg["model"]["name"], **cfg["model"]["kwargs"])
-    if cfg.trainer.gating.enabled:
-        # set wout equal to rescaled transpose of wback
-        # simulates wout warmup
-        wback = orchestrator.lmap[1][2].W  # (C, H)
-        wout = orchestrator.lmap[2][1].W  # (H, C)
-        C, H = wback.shape[0], wback.shape[1]
-        assert wout.shape[0] == H and wout.shape[1] == C
-        scale_ratio = (C / H) ** 0.5 / cfg.model.kwargs.strength_back
-        rescaled_transpose_wback = copy.deepcopy(wback).T * scale_ratio
-        orchestrator = eqx.tree_at(
-            lambda x: x.lmap[2][1].W, orchestrator, rescaled_transpose_wback
-        )
+    # if cfg.trainer.gating.enabled:
+    #     # set wout equal to rescaled transpose of wback
+    #     # simulates wout warmup
+    #     wback = orchestrator.lmap[1][2].W  # (C, H)
+    #     wout = orchestrator.lmap[2][1].W  # (H, C)
+    #     C, H = wback.shape[0], wback.shape[1]
+    #     assert wout.shape[0] == H and wout.shape[1] == C
+    #     scale_ratio = (C / H) ** 0.5 / cfg.model.kwargs.strength_back
+    #     rescaled_transpose_wback = copy.deepcopy(wback).T * scale_ratio
+    #     orchestrator = eqx.tree_at(
+    #         lambda x: x.lmap[2][1].W, orchestrator, rescaled_transpose_wback
+    #     )
     ds = build_dataset(cfg["data"]["name"], **cfg["data"]["kwargs"])
     key, data_key = jax.random.split(key)
     ds.build(data_key)
@@ -375,8 +375,8 @@ def train_once(cfg) -> None:
 
         # ---- Train ----
         if epoch != 0:
-            count = 0
-            avg_logs = defaultdict(float)
+            # count = 0
+            # avg_logs = defaultdict(float)
             for xb, yb in ds:
                 use_gating = cfg.trainer.gating.enabled and (
                     epoch > cfg.trainer.gating.warmup_epochs
@@ -394,13 +394,13 @@ def train_once(cfg) -> None:
                 )
                 trainer.orchestrator = decay(trainer.orchestrator, cfg)
 
-                count += 1
-                for k, v in logs.items():
-                    avg_logs[k] += v
-            for k in avg_logs:
-                avg_logs[k] /= count
-            if wb.get("enabled", True):
-                wandb.log(avg_logs, step=epoch, commit=False)
+                # count += 1
+                # for k, v in logs.items():
+                #     avg_logs[k] += v
+            # for k in avg_logs:
+            #     avg_logs[k] /= count
+            # if wb.get("enabled", True):
+            #     wandb.log(avg_logs, step=epoch, commit=False)
 
         # ---- Eval (test) + per-batch debug ----
         accs_eval = []
