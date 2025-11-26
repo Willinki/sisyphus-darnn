@@ -34,9 +34,9 @@ def save_norms(orchestrator: Any, axis: int | None = None) -> Dict[Index, jnp.nd
     for i, row in orchestrator.lmap.row_items():
         for j, mod in row.items():
             if isinstance(mod, FullyConnected):
-                norms[(i, j)] = _vector_or_frob_norm(jnp.asarray(mod.W), axis)
+                norms[(i, j)] = _vector_or_frob_norm((mod.W), axis)
             elif isinstance(mod, RecurrentDiscrete):
-                J_off = jnp.asarray(mod.J) * jnp.asarray(mod._mask)  # off-diagonal only
+                J_off = (mod.J) * (mod._mask)  # off-diagonal only
                 norms[(i, j)] = _vector_or_frob_norm(J_off, axis)
             # else: ignore
     return norms
@@ -57,7 +57,7 @@ def normalize(
         mod = new_orch.lmap[i][j]
 
         if isinstance(mod, FullyConnected):
-            W = jnp.asarray(mod.W)
+            W = mod.W
             curr = _vector_or_frob_norm(W, axis)
             scale = _safe_scale(target, curr, eps)
             if axis is None:
@@ -72,8 +72,8 @@ def normalize(
             new_orch = eqx.tree_at(lambda o: o.lmap[i][j].W, new_orch, W_new)
 
         elif isinstance(mod, RecurrentDiscrete):
-            J = jnp.asarray(mod.J)
-            mask = jnp.asarray(mod._mask)  # True off-diagonal, False on diagonal
+            J = mod.J
+            mask = mod._mask  # True off-diagonal, False on diagonal
             J_off = J * mask
             curr = _vector_or_frob_norm(J_off, axis)
             scale = _safe_scale(target, curr, eps)
@@ -125,7 +125,7 @@ def decay(
 
     # W_in
     # NOTE: with sparsity, here we also have a mask like for J. However, zero entries remain zero after decay, so we can skip it.
-    W_in = jnp.asarray(new_orch.lmap[1][0].W)
+    W_in = new_orch.lmap[1][0].W
     rescaling_win = (
         config["optimizer"]["weight_decay_win"]
         * config["optimizer"]["learning_rate_win"]
@@ -135,8 +135,8 @@ def decay(
     new_orch = eqx.tree_at(lambda o: o.lmap[1][0].W, new_orch, W_in_new)
 
     # J
-    J = jnp.asarray(new_orch.lmap[1][1].J)
-    mask = jnp.asarray(new_orch.lmap[1][1]._mask)  # exclude diagonal from decay
+    J = new_orch.lmap[1][1].J
+    mask = new_orch.lmap[1][1]._mask  # exclude diagonal from decay
     rescaling_j = (
         config["optimizer"]["weight_decay_j"]
         * config["optimizer"]["learning_rate_j"]
@@ -146,7 +146,7 @@ def decay(
     new_orch = eqx.tree_at(lambda o: o.lmap[1][1].J, new_orch, J_new)
 
     # W_out
-    W_out = jnp.asarray(new_orch.lmap[2][1].W)
+    W_out = new_orch.lmap[2][1].W
     rescaling_wout = (
         config["optimizer"]["weight_decay_wout"]
         * config["optimizer"]["learning_rate_wout"]
@@ -158,7 +158,7 @@ def decay(
     # W_back
     if config["model"]["kwargs"]["learnable_wback"]:
         # this would be a no-op otherwise, since lr is zero
-        W_back = jnp.asarray(new_orch.lmap[1][2].W)
+        W_back = new_orch.lmap[1][2].W
         rescaling_wback = (
             config["optimizer"]["weight_decay_wback"]
             * config["optimizer"]["learning_rate_wback"]
@@ -200,15 +200,15 @@ def clip(
             if isinstance(mod, FullyConnected) and not isinstance(
                 mod, FrozenFullyConnected
             ):
-                W = jnp.asarray(mod.W)
+                W = mod.W
 
                 new_orch = eqx.tree_at(
                     lambda o: o.lmap[receiver_idx][sender_idx].W, new_orch, W_new
                 )
 
             elif isinstance(mod, RecurrentDiscrete):
-                J = jnp.asarray(mod.J)
-                mask = jnp.asarray(mod._mask)  # exclude diagonal from decay
+                J = mod.J
+                mask = mod._mask  # exclude diagonal from decay
                 J_new = J * (1.0 - rho * mask)
                 new_orch = eqx.tree_at(
                     lambda o: o.lmap[receiver_idx][sender_idx].J, new_orch, J_new
