@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Running tj=1.5 jd=0.98 tin=1.5 sf=3.0 lrw=0.02 lrj=0.03"
-
 uv run python scripts/python_scripts/main_tune.py \
   model.kwargs.dim_hidden=1000 \
   epochs=20 \
