@@ -1,7 +1,7 @@
 #!/bin/bash
 
 uv run python scripts/python_scripts/main.py \
-    --config-name=our_sparse_mnist_tuning \
+    --config-name=ours_sparse_mnist_tuning \
     --multirun \
     model.kwargs.dim_hidden=1000 \
     epochs=10 \
