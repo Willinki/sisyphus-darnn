@@ -1,5 +1,11 @@
 defaults:
-  - override hydra/launcher: submitit_slurm
+  - override hydra/launcher: joblib
+
+hydra:
+  launcher:
+    n_jobs: 15
+    verbose: 0
+    backend: multiprocessing
 
 epochs: 20
 
@@ -30,7 +36,7 @@ trainer:
     shift: 1.0
   fake_dynamics:
     enabled: false
-    k: 0.5 # fraction of spins to set to prototype values
+    k: 0.5
     vanilla: true
   double_dynamics: true
   kwargs:
