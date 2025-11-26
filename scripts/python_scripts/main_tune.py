@@ -158,8 +158,7 @@ def run_hyperopt(base_cfg):
     over the subset of hyperparameters defined in apply_optuna_suggestions.
     """
 
-    hyper_cfg = getattr(base_cfg, "hyperopt", None)
-    n_trials = int(hyper_cfg.get("n_trials", 20)) if hyper_cfg is not None else 20
+    n_trials = 100
 
     # ASHA-style pruner in Optuna is SuccessiveHalvingPruner. :contentReference[oaicite:0]{index=0}
     pruner = optuna.pruners.SuccessiveHalvingPruner(
@@ -185,11 +184,7 @@ def run_hyperopt(base_cfg):
         direction="maximize",
         sampler=sampler,
         pruner=pruner,
-        study_name=(
-            hyper_cfg.get("study_name", "asha_optuna_study")
-            if hyper_cfg is not None
-            else "asha_optuna_study"
-        ),
+        study_name=("asha_optuna_study"),
     )
     study.optimize(objective, n_trials=n_trials)
 
@@ -505,11 +500,7 @@ def train_once(cfg) -> None:
     If cfg.hyperopt.enabled is True, run Optuna+ASHA sweep.
     Otherwise, just run a single training as before.
     """
-    hyper_cfg = getattr(cfg, "hyperopt", None)
-    if hyper_cfg is not None and hyper_cfg.get("enabled", False):
-        run_hyperopt(cfg)
-    else:
-        _ = run_training(cfg, trial=None)
+    run_hyperopt(cfg)
 
 
 if __name__ == "__main__":
