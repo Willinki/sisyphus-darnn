@@ -137,7 +137,7 @@ def apply_optuna_suggestions(trial: optuna.Trial, cfg):
     )
 
     # Thresholds, if present — adjust names / ranges to your actual config.
-    cfg.model.kwargs.threshold = trial.suggest_float(
+    cfg.model.kwargs.threshold_j = trial.suggest_float(
         "model.kwargs.threshold_j", 0.9, 2.0, log=False
     )
     cfg.model.kwargs.threshold_up = trial.suggest_float(
