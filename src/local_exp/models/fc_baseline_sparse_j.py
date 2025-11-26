@@ -42,42 +42,26 @@ class SparseFullyConnected(FullyConnected):
     ):
         self.strength = self._set_shape(strength, out_features, dtype)
         self.threshold = self._set_shape(threshold, out_features, dtype)
-
         key_w, key_mask = jax.random.split(key)
-
-        # same random mask as before
         mask = jax.random.bernoulli(
             key_mask, p=1.0 - sparsity, shape=(in_features, out_features)
         )
-        self._mask = mask
-
-        # dense initialization, but only once
-        W_dense = (
+        W = (
             jax.random.normal(key_w, shape=(in_features, out_features), dtype=dtype)
             * self.strength
-            / jnp.sqrt(in_features * (1.0 - sparsity))
-        ) * mask.astype(dtype)
-
-        # store as sparse BCOO
-        self.W = jsparse.BCOO.fromdense(W_dense)  # shape preserved
+            / jnp.sqrt(in_features * (1 - sparsity))
+        )
+        self._mask = mask
+        self.W = W * mask
 
     def backward(
         self, x: Array, y: Array, y_hat: Array, gate: Array | None = None
     ) -> Self:
-        # dense local rule, same as before
-        dW_dense = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
-        dW_dense = dW_dense * self._mask
-
-        dW_sparse = jsparse.BCOO.fromdense(dW_dense)
-
-        # Build an "update module" where only W is nonzero. If your
-        # optimizer just reads .W, you can keep this simple:
-        return eqx.tree_at(
-            lambda m: m.W,
-            self,
-            dW_sparse,
-            is_leaf=lambda x: isinstance(x, jsparse.BCOO),
-        )
+        dW = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
+        dW = dW * self._mask
+        zero_update = jax.tree.map(jnp.zeros_like, self)
+        new_self: Self = eqx.tree_at(lambda m: m.W, zero_update, dW)
+        return new_self
 
 
 class SparseRecurrentDiscrete(Layer):
@@ -164,23 +148,19 @@ class SparseRecurrentDiscrete(Layer):
 
         diag = jnp.diag_indices(features)
         key_j, key_mask = jax.random.split(key)
-
         mask = jax.random.bernoulli(
             key_mask, p=1.0 - sparsity, shape=(features, features)
         )
-        # no self-updates in learning
         mask = mask.at[diag].set(0)
-
-        # dense init (once), then sparsify
-        J_dense = (
+        J = (
             jax.random.normal(key_j, shape=(features, features), dtype=dtype)
-            / jnp.sqrt(features * (1.0 - sparsity))
+            / jnp.sqrt(features * (1 - sparsity))
             * strength_vec
         )
-        J_dense = J_dense * mask.astype(dtype)
-        J_dense = J_dense.at[diag].set(j_d_vec)
+        J = J * mask
+        J = J.at[diag].set(j_d_vec)
 
-        self.J = jsparse.BCOO.fromdense(J_dense)
+        self.J = J
         self.J_D = j_d_vec
         self.threshold = thresh_vec
         self.strength = strength_vec
@@ -290,17 +270,11 @@ class SparseRecurrentDiscrete(Layer):
         >>> new_params = eqx.tree_at(lambda m: m.J, layer, layer.J + lr * upd.J)
 
         """
-        dJ_dense = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
-        dJ_dense = dJ_dense * self._mask  # keep diag zero, etc.
-
-        dJ_sparse = jsparse.BCOO.fromdense(dJ_dense)
-
-        return eqx.tree_at(
-            lambda m: m.J,
-            self,
-            dJ_sparse,
-            is_leaf=lambda x: isinstance(x, jsparse.BCOO),
-        )
+        dJ = perceptron_rule_backward(x, y, y_hat, self.threshold, gate)
+        dJ = dJ * self._mask
+        zero_update = jax.tree.map(jnp.zeros_like, self)
+        new_self: Self = eqx.tree_at(lambda m: m.J, zero_update, dJ)
+        return new_self
 
     @staticmethod
     def _set_shape(x: ArrayLike, dim: int, dtype: DTypeLike) -> Array:
