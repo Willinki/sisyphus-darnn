@@ -1,4 +1,4 @@
 timeout_min: 1420
-mem_gb: 32
-partition: compute
+mem_gb: 4
+partition: defq
 gpus_per_task: 0
