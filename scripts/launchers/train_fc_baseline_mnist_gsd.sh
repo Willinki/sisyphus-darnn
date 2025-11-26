@@ -4,8 +4,8 @@ uv run python scripts/python_scripts/main.py \
     --config-name=our_sparse_mnist_tuning \
     --multirun \
     model.kwargs.dim_hidden=1000 \
-    epochs=20 \
-    torch_clf.epochs=20 \
+    epochs=10 \
+    torch_clf.epochs=10 \
     "wandb.tags=[ours,mnist,tuning]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
