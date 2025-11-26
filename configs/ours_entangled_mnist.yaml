@@ -67,7 +67,7 @@ wandb:
   mode: online
   tags:
     - prova
-  dir: /scratch/ms16518/logs/milano/wandb
+  dir: scratch/ms16518/logs/milano/wandb
   save_code: true
   reinit: false
 
