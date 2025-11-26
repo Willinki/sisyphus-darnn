@@ -307,6 +307,7 @@ class LitMLP(pl.LightningModule):
         model_cfg: ModelConfig,
         optim_cfg: OptimConfig = OptimConfig(),
         clamp: bool = True,  # ignored unless use_clipped_layers is True
+        sparse: bool = False,
     ):
         super().__init__()
         self.save_hyperparameters(
@@ -315,7 +316,15 @@ class LitMLP(pl.LightningModule):
         if model_cfg.use_relu and model_cfg.use_clipped_layers:
             raise ValueError("Cannot have relu and clipped layers")
 
-        if model_cfg.use_relu:
+        if sparse:
+            self.model = SparseMLP(
+                layer_sizes=model_cfg.layer_sizes,
+                use_bias=model_cfg.use_bias,
+                dropout=model_cfg.dropout,
+                binarize=model_cfg.binarize_activations,
+                clamp=clamp,
+            )
+        elif model_cfg.use_relu:
             self.model = MLPRelu(
                 layer_sizes=model_cfg.layer_sizes,
                 use_bias=model_cfg.use_bias,
@@ -485,3 +494,103 @@ def build_clipped_mlp(
 #     )
 #     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
 #     return LitMLP(model_cfg, optim_cfg), None
+
+
+class SparseMLP(nn.Module):
+    """Similar to MLPClipped, but with sparse connections in each layer (except the last)."""
+
+    def __init__(
+        self,
+        layer_sizes: List[int],
+        use_bias: bool = True,
+        dropout: float = 0.0,
+        binarize: bool = True,
+        clamp: bool = True,
+    ):
+        super().__init__()
+        blocks = []
+        for i in range(len(layer_sizes) - 2):
+            in_f, out_f = layer_sizes[i], layer_sizes[i + 1]
+            blocks.append(
+                LinearClipped(
+                    in_f,
+                    out_f,
+                    bias=use_bias,
+                    binarize=binarize,
+                    clamp=clamp,
+                )
+            )
+            if dropout > 0:
+                blocks.append(nn.Dropout(dropout))
+        blocks.append(
+            nn.Linear(layer_sizes[-2], layer_sizes[-1], bias=use_bias)
+        )  # last layer: no clipping/binarization
+        self.blocks = blocks
+        self.net = nn.Sequential(*blocks)
+
+        # sample fixed random sparsity masks for each layer except the last
+        sparsities = [0.9, 0.99]
+        with torch.no_grad():
+            i = 0
+            masks = []
+            for block in self.blocks:
+                if isinstance(block, LinearClipped):
+                    sparsity = sparsities[i]
+                    i += 1
+                    weight = block.linear.weight
+                    mask = torch.rand_like(weight) > sparsity
+                    masks.append(mask)
+                    weight.mul_(
+                        mask.float() / ((1.0 - sparsity) ** 0.5)
+                    )  # preserve variance
+            self.masks = masks
+
+    def sparsify_weights(self):
+        """Apply the sparsity masks to the weights."""
+        with torch.no_grad():
+            i = 0
+            for block in self.blocks:
+                if isinstance(block, LinearClipped):
+                    mask = self.masks[i]
+                    i += 1
+                    block.linear.weight.mul_(mask)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        self.sparsify_weights()
+        return self.net(x)
+
+    def forward_features(self, x: torch.Tensor) -> torch.Tensor:
+        self.sparsify_weights()
+        layers = list(self.net.children())
+        for layer in layers[:-1]:
+            x = layer(x)
+        return x
+
+
+@register_model("sparse-clipped-3layer-mlp")
+def build_sparse_clipped_mlp(
+    input_dim,
+    hidden_dim,
+    output_dim,
+    gain,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="sgd",
+    argmax_margin=1.0,
+    use_bias=True,
+    clamp=True,
+    num_hidden_layers: int = 2,
+):
+    layer_sizes = [input_dim] + [hidden_dim] * num_hidden_layers + [output_dim]
+    model_cfg = ModelConfig(
+        layer_sizes=layer_sizes,
+        activation_gain=gain,  # Note: unused in MLPClipped, but kept for consistency
+        binarize_activations=True,
+        dropout=0.0,
+        use_bias=use_bias,
+        use_clipped_layers=True,
+        loss_type=loss_type,
+        argmax_margin=argmax_margin,
+    )
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
+    return LitMLP(model_cfg, optim_cfg, clamp=clamp, sparse=True), None
