@@ -15,7 +15,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.sparsity=0.99 \
     model.kwargs.sparsity_win=0.9 \
     model.kwargs.j_d=0.9 \
-    'model.kwargs.threshold_in=1.7,1.9 \
+    'model.kwargs.threshold_in=1.7,1.9' \
     'model.kwargs.threshold_j=1.7,1.9' \
     model.kwargs.threshold_out=3.8 \
     'model.kwargs.strength_forth=4.7,4.5' \
