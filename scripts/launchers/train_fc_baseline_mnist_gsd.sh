@@ -18,7 +18,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.threshold_in=1.7 \
     model.kwargs.threshold_j=1.7 \
     model.kwargs.threshold_out=3.8 \
-    'model.kwargs.strength_forth=4.4,4.7,5.0' \
+    'model.kwargs.strength_forth=4.7,5.0' \
     model.kwargs.strength_back=1.7 \
     'optimizer.weight_decay_j=0.0004,0.0001' \
     'optimizer.weight_decay_win=0.001,0.01' \
