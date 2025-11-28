@@ -2,6 +2,7 @@
 
 # final good configuration. last tests
 uv run python scripts/python_scripts/main.py \
+    --multirun \
     --config-name=ours_sparse_mnist_tuning \
     model.kwargs.dim_hidden=1000 \
     epochs=20 \
@@ -18,8 +19,8 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.threshold_in=1.78 \
     model.kwargs.threshold_j=1.78 \
     model.kwargs.threshold_out=7 \
-    model.kwargs.strength_forth=5.0 \
-    model.kwargs.strength_back=1.62 \
+    model.kwargs.strength_forth='5.0,5.1,5.2,5.3' \
+    model.kwargs.strength_back='1.7,1.9,2.1,2.3' \
     optimizer.weight_decay_j=0.00006 \
     optimizer.weight_decay_win=0.01 \
     optimizer.weight_decay_wout=0.02 \
