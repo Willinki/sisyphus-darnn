@@ -68,8 +68,8 @@ model:
 wandb:
   enabled: true
   entity: willinki-bocconi-university
-  project: darnax-new-benchmarks-tuning-mnist
-  run_name: "prova"
+  project: mnist-scaling
+  run_name: "fc-baseline"
   mode: online
   tags:
     - prova
