@@ -46,18 +46,20 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
     # ------------------------
     # Sample hyperparameters
     # ------------------------
-    strength_back = trial.suggest_float("strength_back", 1.3, 3.3)
-    strength_forth = trial.suggest_float("strength_forth", 4.2, 5.5)
+    strength_back = trial.suggest_float("strength_back", 1.0, 2.0)
+    strength_forth = trial.suggest_float("strength_forth", 4.2, 5.0)
     threshold_in = trial.suggest_float("threshold_in", 1.2, 2.0)
     threshold_j = trial.suggest_float("threshold_j", 1.2, 2.0)
     threshold_back = 0.0
-    j_d = trial.suggest_float("j_d", 0.5, 1.0)
+    j_d = trial.suggest_float("j_d", 0.7, 1.0)
 
     learning_rate_j = trial.suggest_float("learning_rate_j", 0.05, 0.4, log=True)
     learning_rate_win = trial.suggest_float("learning_rate_win", 0.1, 0.4, log=True)
 
     weight_decay_j = trial.suggest_float("weight_decay_j", 5e-5, 3e-3, log=True)
     weight_decay_win = trial.suggest_float("weight_decay_win", 5e-9, 2e-3, log=True)
+
+    torch_cfl_lr = trial.suggest_float("torch_clf_lr", 0.0001, 0.01, log=True)
 
     # Optional: give each trial a tag so it's easy to spot in wandb
     trial_tag = f"optuna_trial_{trial.number}"
@@ -73,8 +75,8 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         "scripts/python_scripts/main.py",
         "--config-name=ours_sparse_fmnist_tuning",
         "model.kwargs.dim_hidden=1000",
-        "epochs=5",
-        "torch_clf.epochs=5",
+        "epochs=20",
+        "torch_clf.epochs=20",
         "torch_clf.enabled=true",
         "data.kwargs.x_transform=identity",
         "data.kwargs.linear_projection=null",
@@ -84,6 +86,7 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         "model.kwargs.sparsity=0.99",
         "model.kwargs.sparsity_win=0.9",
         "trainer.fake_dynamics.k=0.5",
+        f"torch_clf.lr={torch_cfl_lr}",
         f"wandb.run_name={trial_tag}",
         f"wandb.tags=[ours,mnist,tuning,optuna,{trial_tag}]",
     ]
