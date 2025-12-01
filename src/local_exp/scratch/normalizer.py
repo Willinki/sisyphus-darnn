@@ -128,8 +128,9 @@ def decay(
     W_in = new_orch.lmap[1][0].W
     rescaling_win = (
         config["optimizer"]["weight_decay_win"]
-        * config["optimizer"]["learning_rate_win"]
         * jnp.sqrt(1 - 0.90)
+        * config["optimizer"]["learning_rate_win"]
+        / jnp.sqrt(1 - config["model"]["kwargs"]["sparsity_win"])
         / (config["model"]["kwargs"]["dim_data"] ** 0.5)
     )
     W_in_new = W_in * (1.0 - rescaling_win)
@@ -140,8 +141,9 @@ def decay(
     mask = new_orch.lmap[1][1]._mask  # exclude diagonal from decay
     rescaling_j = (
         config["optimizer"]["weight_decay_j"]
-        * config["optimizer"]["learning_rate_j"]
         * jnp.sqrt(1 - 0.99)
+        * config["optimizer"]["learning_rate_j"]
+        / jnp.sqrt(1 - config["model"]["kwargs"]["sparsity"])
         / (config["model"]["kwargs"]["dim_hidden"] ** 0.5)
     )
     J_new = J * (1.0 - rescaling_j * mask)
