@@ -129,6 +129,7 @@ def decay(
     rescaling_win = (
         config["optimizer"]["weight_decay_win"]
         * config["optimizer"]["learning_rate_win"]
+        * jnp.sqrt(1 - 0.90)
         / (config["model"]["kwargs"]["dim_data"] ** 0.5)
     )
     W_in_new = W_in * (1.0 - rescaling_win)
@@ -140,6 +141,7 @@ def decay(
     rescaling_j = (
         config["optimizer"]["weight_decay_j"]
         * config["optimizer"]["learning_rate_j"]
+        * jnp.sqrt(1 - 0.99)
         / (config["model"]["kwargs"]["dim_hidden"] ** 0.5)
     )
     J_new = J * (1.0 - rescaling_j * mask)
