@@ -108,6 +108,52 @@ class LinearRelu(nn.Module):
         pass
 
 
+class BinaryPerceptron(nn.Module):
+    """
+    Binary Perceptron: random projection (frozen) -> sign nonlinearity -> linear layer.
+    The random projection and sign are not trainable; only the final linear layer is trained.
+    """
+
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int,
+        output_dim: int,
+        use_bias: bool = True,
+    ):
+        super().__init__()
+        # Frozen random projection layer
+        self.projection = nn.Linear(input_dim, hidden_dim, bias=False)
+        # Initialize with random normal (not trainable)
+        nn.init.normal_(self.projection.weight, mean=0.0, std=1.0)
+        # Freeze the projection layer
+        self.projection.weight.requires_grad = False
+
+        # Sign activation (using straight-through estimator for gradients)
+        self.sign = BinaryActivationSTE()
+
+        # Trainable linear readout layer
+        self.readout = nn.Linear(hidden_dim, output_dim, bias=use_bias)
+        nn.init.xavier_uniform_(self.readout.weight)
+        if use_bias and self.readout.bias is not None:
+            nn.init.zeros_(self.readout.bias)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Random projection
+        x = self.projection(x)
+        # Sign nonlinearity
+        x = self.sign(x)
+        # Trainable readout
+        x = self.readout(x)
+        return x
+
+    def forward_features(self, x: torch.Tensor) -> torch.Tensor:
+        """Return the binary features after sign activation."""
+        x = self.projection(x)
+        x = self.sign(x)
+        return x
+
+
 # -----------------------------
 #  MLP Builders
 # -----------------------------
@@ -296,6 +342,7 @@ class ModelConfig:
     use_bias: bool = True
     use_clipped_layers: bool = False  # NEW
     use_relu: bool = False
+    use_binary_perceptron: bool = False  # NEW
     loss_type: str = "cross_entropy"
     argmax_margin: float = 1.0
     num_classes: Optional[int] = None
@@ -314,8 +361,34 @@ class LitMLP(pl.LightningModule):
         )
         if model_cfg.use_relu and model_cfg.use_clipped_layers:
             raise ValueError("Cannot have relu and clipped layers")
+        if (
+            sum(
+                [
+                    model_cfg.use_relu,
+                    model_cfg.use_clipped_layers,
+                    model_cfg.use_binary_perceptron,
+                ]
+            )
+            > 1
+        ):
+            raise ValueError(
+                "Can only have one of: relu, clipped_layers, or binary_perceptron"
+            )
 
-        if model_cfg.use_relu:
+        if model_cfg.use_binary_perceptron:
+            # Binary Perceptron: expects layer_sizes with 3 elements [input, hidden, output]
+            if len(model_cfg.layer_sizes) != 3:
+                raise ValueError(
+                    f"BinaryPerceptron expects exactly 3 layer_sizes (input, hidden, output), "
+                    f"got {len(model_cfg.layer_sizes)}"
+                )
+            self.model = BinaryPerceptron(
+                input_dim=model_cfg.layer_sizes[0],
+                hidden_dim=model_cfg.layer_sizes[1],
+                output_dim=model_cfg.layer_sizes[2],
+                use_bias=model_cfg.use_bias,
+            )
+        elif model_cfg.use_relu:
             self.model = MLPRelu(
                 layer_sizes=model_cfg.layer_sizes,
                 use_bias=model_cfg.use_bias,
@@ -461,6 +534,32 @@ def build_clipped_mlp(
     )
     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg, clamp=clamp), None
+
+
+@register_model("rp-sign-perceptron-ce")
+def build_binary_perceptron(
+    input_dim,
+    hidden_dim,
+    output_dim,
+    loss_type="cross_entropy",
+    lr=1e-3,
+    optim="adam",
+    use_bias=True,
+):
+    """Binary Perceptron with frozen random projection and sign activation."""
+    model_cfg = ModelConfig(
+        layer_sizes=[input_dim, hidden_dim, output_dim],
+        activation_gain=0.0,  # Not used for binary perceptron
+        binarize_activations=False,  # Not used
+        dropout=0.0,
+        use_bias=use_bias,
+        use_clipped_layers=False,
+        use_relu=False,
+        use_binary_perceptron=True,
+        loss_type=loss_type,
+    )
+    optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
+    return LitMLP(model_cfg, optim_cfg), None
 
 
 # @register_model("relu-3layer-mlp")

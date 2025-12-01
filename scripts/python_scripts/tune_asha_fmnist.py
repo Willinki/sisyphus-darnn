@@ -46,7 +46,7 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
     # ------------------------
     # Sample hyperparameters
     # ------------------------
-    strength_back = trial.suggest_float("strength_back", 1.3, 3.0)
+    strength_back = trial.suggest_float("strength_back", 1.3, 3.3)
     strength_forth = trial.suggest_float("strength_forth", 4.2, 5.5)
     threshold_in = trial.suggest_float("threshold_in", 1.2, 2.0)
     threshold_j = trial.suggest_float("threshold_j", 1.2, 2.0)
@@ -57,7 +57,7 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
     learning_rate_win = trial.suggest_float("learning_rate_win", 0.1, 0.4, log=True)
 
     weight_decay_j = trial.suggest_float("weight_decay_j", 5e-5, 3e-3, log=True)
-    weight_decay_win = trial.suggest_float("weight_decay_win", 5e-4, 2e-3, log=True)
+    weight_decay_win = trial.suggest_float("weight_decay_win", 5e-9, 2e-3, log=True)
 
     # Optional: give each trial a tag so it's easy to spot in wandb
     trial_tag = f"optuna_trial_{trial.number}"
@@ -71,13 +71,10 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         "run",
         "python",
         "scripts/python_scripts/main.py",
-        "--config-name=ours_sparse_mnist_tuning",
-        # no --multirun: one run == one Optuna trial
-        #
-        # Fixed config pieces from your original script:
-        "model.kwargs.dim_hidden=250",
-        "epochs=20",
-        "torch_clf.epochs=20",
+        "--config-name=ours_sparse_fmnist_tuning",
+        "model.kwargs.dim_hidden=1000",
+        "epochs=5",
+        "torch_clf.epochs=5",
         "torch_clf.enabled=true",
         "data.kwargs.x_transform=identity",
         "data.kwargs.linear_projection=null",
@@ -87,9 +84,6 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         "model.kwargs.sparsity=0.99",
         "model.kwargs.sparsity_win=0.9",
         "trainer.fake_dynamics.k=0.5",
-        # you can optionally turn off wandb in sweeps to save time
-        # "wandb.enabled=false",
-        # or at least set run name/tag to see which trial is which
         f"wandb.run_name={trial_tag}",
         f"wandb.tags=[ours,mnist,tuning,optuna,{trial_tag}]",
     ]
