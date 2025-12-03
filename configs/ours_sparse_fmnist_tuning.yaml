@@ -83,7 +83,7 @@ torch_clf:
   enabled: true
   optimizer: sgd
   epochs: 20
-  lr: 0.005
+  lr: 0.0015
   batch_size: 16
   weight_decay: 0.0
   log_prefix: torch_clf

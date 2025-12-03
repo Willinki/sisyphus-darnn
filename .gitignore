@@ -220,3 +220,5 @@ lightning_logs/*
 .venv/*
 ray_results/*
 wandb_logs/*
+
+notebooks/*

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 uv run python scripts/python_scripts/main_tune.py \
-  model.kwargs.dim_hidden=1000 \
+  model.kwargs.dim_hidden=500 \
   epochs=20 \
   torch_clf.epochs=20 \
   "wandb.tags=[ours,mnist,tuning]" \
