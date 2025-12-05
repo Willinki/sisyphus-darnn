@@ -1,11 +1,25 @@
 defaults:
   - override hydra/launcher: joblib
 
+num_threads_per_job: 8
+
 hydra:
   launcher:
-    n_jobs: 15
+    n_jobs: 2
     verbose: 0
     backend: multiprocessing
+
+  job:
+    env_set:
+      # JAX / XLA: limit CPU thread pool size
+      XLA_FLAGS: "--xla_cpu_multi_thread_eigen=true --xla_cpu_multi_thread_eigen_num_threads=${num_threads_per_job}"
+
+      # BLAS / PyTorch CPU threads
+      OMP_NUM_THREADS: "${num_threads_per_job}"
+      MKL_NUM_THREADS: "${num_threads_per_job}"
+      OPENBLAS_NUM_THREADS: "${num_threads_per_job}"
+      NUMEXPR_NUM_THREADS: "${num_threads_per_job}"
+      TORCH_NUM_THREADS: "${num_threads_per_job}"
 
 epochs: 20
 
