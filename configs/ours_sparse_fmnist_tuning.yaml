@@ -10,7 +10,7 @@ hydra:
   job:
     env_set:
       # JAX / XLA: limit CPU thread pool size to 4
-      XLA_FLAGS: "--xla_cpu_multi_thread_eigen=true --xla_cpu_multi_thread_eigen_num_threads=4"
+      XLA_FLAGS: "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=4"
 
       # BLAS / PyTorch CPU threads
       OMP_NUM_THREADS: "4"
