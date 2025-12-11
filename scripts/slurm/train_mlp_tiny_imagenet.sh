@@ -25,8 +25,8 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
     model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=600 \
-    'model.kwargs.lr=0.0005,0.001,0.0001,0.002,0.005' \
+    model.kwargs.hidden_dim=300 \
+    model.kwargs.lr=0.0001 \
     epochs=20 \
     'wandb.tags=[baseline,tiny_imagenet,non-hetero]' \
     model.kwargs.use_bias=false \
