@@ -1,0 +1,42 @@
+defaults:
+  - override hydra/launcher: joblib
+
+data:
+  name: "tiny_imagenet"
+  kwargs:
+    batch_size: 64
+    num_images_per_class: null
+    x_transform: identity
+    linear_projection: null
+    label_mode: "ooe"
+
+model:
+  name: "clipped-3layer-mlp"
+  kwargs:
+    input_dim: 2048
+    hidden_dim: 1000
+    output_dim: 200
+    num_hidden_layers: 2
+    gain: 1.0 # kept for consistency with other builders
+    lr: 1e-3
+    loss_type: "cross_entropy"
+    argmax_margin: 1.0
+    optim: "sgd"
+    use_bias: false
+    clamp: true
+
+wandb:
+  enabled: true
+  entity: willinki-bocconi-university
+  project: tiny_imagenet-scaling
+  run_name: base-${now:%Y%m%d-%H%M%S}-${model.name}
+  mode: online
+  dir: ${oc.env:WANDB_DIR,${hydra:runtime.output_dir}}
+  tags: ["clipped-mlp", "non-hetero"]
+
+# Global training knobs
+epochs: 20
+epochs_readout: 20
+
+name: ${model.name}/${data.name}
+master_seed: 44

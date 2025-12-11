@@ -1,0 +1,4 @@
+name: "tiny_imagenet"
+kwargs:
+  batch_size : 64
+  x_transform : "identity"
