@@ -15,6 +15,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=325 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.001 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -45,6 +46,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=650 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.0007 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -74,6 +76,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=975 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.0007 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -102,6 +105,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=1400 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.0005 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -130,6 +134,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=1725 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.0005 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -158,6 +163,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.dim_hidden=2050 \
     epochs=20 \
     torch_clf.epochs=20 \
+    torch_clf.lr=0.0005 \
     "wandb.tags=[ours,tiny-imagenet,scaling-h]" \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
