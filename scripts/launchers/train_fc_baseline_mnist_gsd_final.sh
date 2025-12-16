@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#SBATCH --job-name=train-ours
+#SBATCH --partition=compute
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=32G
+#SBATCH --output=train-mlp_%j.out
+#SBATCH --error=train-mlp_%j.err
 # final good configuration. last tests
 uv run python scripts/python_scripts/main.py \
     --config-name=ours_sparse_mnist_tuning \
