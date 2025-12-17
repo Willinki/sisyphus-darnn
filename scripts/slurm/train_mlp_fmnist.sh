@@ -18,14 +18,106 @@
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
 uv run python3.11 scripts/python_scripts/training_mlp.py \
     --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=100 \
+    model.kwargs.lr=0.002 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
+    data.kwargs.batch_size=16
+
+uv run python3.11 scripts/python_scripts/training_mlp.py \
+    --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=200 \
+    model.kwargs.lr=0.002 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
+    data.kwargs.batch_size=16
+
+uv run python3.11 scripts/python_scripts/training_mlp.py \
+    --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=300 \
+    model.kwargs.lr=0.002 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
+    data.kwargs.batch_size=16
+
+uv run python3.11 scripts/python_scripts/training_mlp.py \
+    --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=400 \
+    model.kwargs.lr=0.002 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
+    data.kwargs.batch_size=16
+
+uv run python3.11 scripts/python_scripts/training_mlp.py \
+    --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
+    data.kwargs.x_transform='identity' \
+    data.kwargs.linear_projection=null \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=500 \
+    model.kwargs.lr=0.002 \
+    epochs=20 \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
+    model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
+    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
+    data.kwargs.batch_size=16
+
+uv run python3.11 scripts/python_scripts/training_mlp.py \
+    --config-name=binary_mlp_fmnist \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
     data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
     model.kwargs.hidden_dim=600 \
-    model.kwargs.lr=0.009 \
+    model.kwargs.lr=0.002 \
     epochs=20 \
-    'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \

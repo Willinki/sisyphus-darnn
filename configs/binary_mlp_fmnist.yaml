@@ -1,5 +1,5 @@
 defaults:
-  - override hydra/launcher: submitit_slurm
+  - override hydra/launcher: joblib
 
 data:
   name: "fashion_mnist"
@@ -28,7 +28,7 @@ model:
 wandb:
   enabled: true
   entity: willinki-bocconi-university
-  project: fmnist-scaling
+  project: fashion_mnist-scaling
   run_name: base-${now:%Y%m%d-%H%M%S}-${model.name}
   mode: online
   dir: ${oc.env:WANDB_DIR,${hydra:runtime.output_dir}}
