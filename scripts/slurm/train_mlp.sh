@@ -16,7 +16,7 @@
 #source "$(conda info --base)/etc/profile.d/conda.sh"
 
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \
@@ -32,7 +32,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \
@@ -48,7 +48,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \
@@ -64,7 +64,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \
@@ -80,7 +80,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \
@@ -96,7 +96,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='identity' \

@@ -16,7 +16,7 @@
 #source "$(conda info --base)/etc/profile.d/conda.sh"
 
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
@@ -37,7 +37,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     data.kwargs.batch_size=16
 
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
@@ -57,7 +57,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
@@ -77,7 +77,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
@@ -97,7 +97,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
@@ -117,7 +117,7 @@ uv run python3.11 scripts/python_scripts/training_mlp.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_mlp.py \
+uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     --config-name=binary_mlp_tinyimagenet \
     'master_seed=33,44,55,66,77' \
