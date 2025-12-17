@@ -1,17 +1,53 @@
-#!/bin/bash -e
+#!/bin/bash
+#SBATCH --job-name=train-ours
+#SBATCH --partition=compute
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=32G
+#SBATCH --output=train-mlp_%j.out
+#SBATCH --error=train-mlp_%j.err
+
+
+# Conda
+uv run python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=5603 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=1.25 \
 
 uv run python scripts/python_scripts/main.py \
-    model.kwargs.dim_hidden=1000 \
-    epochs=20 \
-    'wandb.tags=[ours,mnist,tuning]' \
-    model.name=fc-baseline-sparse-fully \
-    model.kwargs.sparsity=0.99 \
-    model.kwargs.sparsity_win=0.9 \
-    model.kwargs.threshold_j=1.4 \
-    model.kwargs.j_d=0.9 \
-    model.kwargs.threshold_in=1.6 \
-    model.kwargs.strength_forth=5.0 \
-    optimizer.learning_rate_win=0.3 \
-    optimizer.weight_decay_j=0.01 \
-    optimizer.learning_rate_j=0.02 \
-    trainer.fake_dynamics.k=0.5
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=4612 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=1.75 \
+
+uv run python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=3626 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=2.0 \
+
+uv run python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=2646 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=1.75 \
+
+uv run python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=1683 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=2.5 \
+
+uv run python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=760 \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=3.5 \
