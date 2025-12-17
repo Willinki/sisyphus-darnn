@@ -12,6 +12,7 @@
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=1155 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -41,6 +42,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=1660 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -70,6 +72,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=2216 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -99,6 +102,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=2817 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -128,6 +132,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=3458 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -157,6 +162,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_tinyimagenet_tuning \
+    'master_seed=33,44' \
     model.kwargs.dim_hidden=4134 \
     epochs=20 \
     torch_clf.epochs=20 \

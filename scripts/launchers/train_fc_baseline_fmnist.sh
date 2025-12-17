@@ -12,6 +12,7 @@
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_fmnist_tuning \
+    'master_seed=55,66,18' \
     model.kwargs.dim_hidden=916 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -68,6 +69,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_fmnist_tuning \
+    'master_seed=55,66,18' \
     model.kwargs.dim_hidden=2815 \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -167,7 +169,7 @@ uv run python scripts/python_scripts/main.py \
     model.kwargs.threshold_j=1.74 \
     model.kwargs.threshold_out=7 \
     model.kwargs.strength_forth=4.91 \
-    model.kwargs.strength_back=1.2 \
+    'model.kwargs.strength_back=1.84,0.9,1.5,1.2' \
     optimizer.weight_decay_j=0.0001 \
     optimizer.weight_decay_win=0.00002 \
     optimizer.weight_decay_wout=0.02 \
