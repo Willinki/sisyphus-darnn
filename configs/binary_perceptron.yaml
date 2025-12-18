@@ -1,5 +1,5 @@
 defaults:
-  - override hydra/launcher: submitit_slurm
+  - override hydra/launcher: joblib
 
 data:
   name: "general_mnist"
@@ -20,6 +20,7 @@ model:
     loss_type: "cross_entropy"
     optim: "sgd"
     use_bias: false
+    sparsity: 0.9
 
 wandb:
   enabled: true

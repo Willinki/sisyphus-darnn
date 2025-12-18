@@ -17,113 +17,109 @@
 
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=312 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=9461 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=726 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=1011 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=1208 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=2248 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=1208 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=3712 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=1770 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=5402 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    data.name='fashion_mnist' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=2412 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
+    model.kwargs.input_dim=784 \
+    model.kwargs.hidden_dim=7319 \
+    model.kwargs.lr=0.0009 \
+    model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
     model.kwargs.use_bias=false \
+    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    data.kwargs.batch_size=16
-
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
-    data.name='tiny_imagenet' \
-    data.kwargs.x_transform='identity' \
-    data.kwargs.linear_projection=null \
-    data.kwargs.label_mode='ooe' \
-    model.kwargs.input_dim=512 \
-    model.kwargs.hidden_dim=3133 \
-    model.kwargs.output_dim=200 \
-    model.kwargs.lr=0.0001 \
-    epochs=20 \
-    'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
-    'wandb.project=tiny_imagenet-scaling' \
-    model.kwargs.use_bias=false \
-    model.kwargs.loss_type=cross_entropy \
+    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16

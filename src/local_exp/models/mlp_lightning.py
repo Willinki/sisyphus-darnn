@@ -120,12 +120,21 @@ class BinaryPerceptron(nn.Module):
         hidden_dim: int,
         output_dim: int,
         use_bias: bool = True,
+        sparsity: float = 0.9,
     ):
         super().__init__()
         # Frozen random projection layer
         self.projection = nn.Linear(input_dim, hidden_dim, bias=False)
         # Initialize with random normal (not trainable)
         nn.init.normal_(self.projection.weight, mean=0.0, std=1.0)
+
+        # Sparsify: set 90% of connections to zero
+        if sparsity > 0:
+            mask = torch.rand_like(self.projection.weight) > sparsity
+            self.projection.weight.data *= mask.float()
+            # Rescale to maintain variance: divide by sqrt(1 - sparsity)
+            self.projection.weight.data /= (1.0 - sparsity) ** 0.5
+
         # Freeze the projection layer
         self.projection.weight.requires_grad = False
 
@@ -346,6 +355,7 @@ class ModelConfig:
     loss_type: str = "cross_entropy"
     argmax_margin: float = 1.0
     num_classes: Optional[int] = None
+    sparsity: float = 0.0
 
 
 class LitMLP(pl.LightningModule):
@@ -387,6 +397,7 @@ class LitMLP(pl.LightningModule):
                 hidden_dim=model_cfg.layer_sizes[1],
                 output_dim=model_cfg.layer_sizes[2],
                 use_bias=model_cfg.use_bias,
+                sparsity=model_cfg.sparsity,
             )
         elif model_cfg.use_relu:
             self.model = MLPRelu(
@@ -545,6 +556,7 @@ def build_binary_perceptron(
     lr=1e-3,
     optim="adam",
     use_bias=True,
+    sparsity: float = 0.9,
 ):
     """Binary Perceptron with frozen random projection and sign activation."""
     model_cfg = ModelConfig(
@@ -557,6 +569,7 @@ def build_binary_perceptron(
         use_relu=False,
         use_binary_perceptron=True,
         loss_type=loss_type,
+        sparsity=sparsity,
     )
     optim_cfg = OptimConfig(name=optim, lr=lr, weight_decay=0.0)
     return LitMLP(model_cfg, optim_cfg), None
