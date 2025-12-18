@@ -1,12 +1,12 @@
 #!/bin/bash -e
-#SBATCH --job-name=train-mlp
+#SBATCH --job-name=train-perc
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=32G
-#SBATCH --output=train-mlp_%j.out
-#SBATCH --error=train-mlp_%j.err
+#SBATCH --output=train-perc_%j.out
+#SBATCH --error=train-perc_%j.err
 
 #PROJECT_ROOT="${SLURM_SUBMIT_DIR}"
 #mkdir -p "${PROJECT_ROOT}/logs"
@@ -16,7 +16,7 @@
 #source "$(conda info --base)/etc/profile.d/conda.sh"
 
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
@@ -34,7 +34,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
@@ -52,7 +52,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
@@ -70,7 +70,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
@@ -88,7 +88,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
@@ -106,7 +106,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \

@@ -16,7 +16,7 @@
 #source "$(conda info --base)/etc/profile.d/conda.sh"
 
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -32,7 +32,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -48,7 +48,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -64,7 +64,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -80,7 +80,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -96,7 +96,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
@@ -112,7 +112,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.loss_type=cross_entropy \
     data.kwargs.batch_size=16
 
-uv run python3.11 scripts/python_scripts/training_perceptron.py \
+uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
