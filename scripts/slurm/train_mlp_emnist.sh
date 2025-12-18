@@ -1,10 +1,10 @@
 #!/bin/bash -e
 #SBATCH --job-name=train-mlp
-#SBATCH --partition=defq
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --output=train-mlp_%j.out
 #SBATCH --error=train-mlp_%j.err
 
@@ -20,12 +20,13 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=600 \
     model.kwargs.lr=0.003 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project='emnist_scaling' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
@@ -36,11 +37,12 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=100 \
     model.kwargs.lr=0.003 \
     epochs=20 \
+    wandb.project='emnist_scaling' \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
@@ -52,11 +54,12 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=200 \
     model.kwargs.lr=0.003 \
     epochs=20 \
+    wandb.project='emnist_scaling' \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
@@ -68,11 +71,12 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=300 \
     model.kwargs.lr=0.003 \
     epochs=20 \
+    wandb.project='emnist_scaling' \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
@@ -84,11 +88,12 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=400 \
     model.kwargs.lr=0.003 \
     epochs=20 \
+    wandb.project='emnist_scaling' \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
@@ -100,11 +105,12 @@ uv run python scripts/python_scripts/training_mlp.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=500 \
     model.kwargs.lr=0.003 \
     epochs=20 \
+    wandb.project='emnist_scaling' \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
