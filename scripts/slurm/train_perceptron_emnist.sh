@@ -29,9 +29,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
@@ -47,9 +45,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
@@ -65,9 +61,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
@@ -83,9 +77,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
@@ -101,9 +93,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
 
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
@@ -119,7 +109,5 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     wandb.project="emnist_scaling" \
     model.kwargs.use_bias=false \
-    model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
-    model.kwargs.num_hidden_layers=2 \
     data.kwargs.batch_size=16
