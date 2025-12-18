@@ -19,8 +19,9 @@
 uv run python3.11 scripts/python_scripts/training_perceptron.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
+    model.kwargs.sparsity=0.9 \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=2000 \
+    model.kwargs.hidden_dim=9461 \
     model.kwargs.lr=0.0009 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \

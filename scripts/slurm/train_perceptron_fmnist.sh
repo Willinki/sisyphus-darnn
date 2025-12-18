@@ -28,6 +28,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project="fashion_mnist-scaling" \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
@@ -46,6 +47,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project="fashion_mnist-scaling" \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
@@ -64,6 +66,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project="fashion_mnist-scaling" \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
@@ -81,6 +84,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.lr=0.0009 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
+    wandb.project="fashion_mnist-scaling" \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
@@ -100,6 +104,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project="fashion_mnist-scaling" \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
@@ -118,6 +123,7 @@ uv run python3.11 scripts/python_scripts/training_perceptron.py \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
+    wandb.project="fashion_mnist-scaling" \
     model.kwargs.use_bias=false \
     model.kwargs.clamp=true \
     model.kwargs.loss_type=cross_entropy \
