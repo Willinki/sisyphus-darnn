@@ -23,7 +23,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
     data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=1050 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
@@ -39,7 +39,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
     data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=3100 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
@@ -52,10 +52,10 @@ uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=6150 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
@@ -68,10 +68,10 @@ uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=10200 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
@@ -84,10 +84,10 @@ uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=15250 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
@@ -100,10 +100,10 @@ uv run python scripts/python_scripts/training_perceptron.py \
     --multirun \
     'master_seed=33,44,55,66,77' \
     data.kwargs.x_transform='sign' \
-    data.kwargs.linear_projection=null \
+    data.kwargs.linear_projection=100 \
     model.kwargs.input_dim=100 \
     model.kwargs.hidden_dim=21300 \
-    model.kwargs.lr=0.0009 \
+    model.kwargs.lr=0.0005 \
     model.kwargs.sparsity=0.9 \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,emnist,non-hetero]' \
