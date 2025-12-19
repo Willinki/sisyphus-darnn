@@ -18,6 +18,7 @@
 #conda run -p "$CONDA_ENV" python ${PROJECT_ROOT}/scripts/python_scripts/training_mlp.py \
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -34,6 +35,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -50,6 +52,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -66,6 +69,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -82,6 +86,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -98,6 +103,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
@@ -114,6 +120,7 @@ uv run python scripts/python_scripts/training_perceptron.py \
 
 uv run python scripts/python_scripts/training_perceptron.py \
     data.name='tiny_imagenet' \
+    'master_seed=44,55,66,77' \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     data.kwargs.label_mode='ooe' \
