@@ -153,6 +153,7 @@ uv run python scripts/python_scripts/main.py \
 
 uv run python scripts/python_scripts/main.py \
     --config-name=ours_sparse_fmnist_tuning \
+    --multirun \
     model.kwargs.dim_hidden=6000 \
     epochs=20 \
     torch_clf.epochs=20 \
