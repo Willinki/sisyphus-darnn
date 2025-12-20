@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --output=train-mlp_%j.out
 #SBATCH --error=train-mlp_%j.err
 
@@ -24,8 +24,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=100 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=109 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
@@ -42,8 +42,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=200 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=214 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
@@ -60,8 +60,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=300 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=319 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
@@ -78,8 +78,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=400 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=422 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
@@ -96,8 +96,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=500 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=525 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \
@@ -114,8 +114,8 @@ uv run python scripts/python_scripts/training_mlp.py \
     data.kwargs.x_transform='identity' \
     data.kwargs.linear_projection=null \
     model.kwargs.input_dim=784 \
-    model.kwargs.hidden_dim=600 \
-    model.kwargs.lr=0.002 \
+    model.kwargs.hidden_dim=626 \
+    'model.kwargs.lr=0.003,0.001' \
     epochs=20 \
     'wandb.tags=[baseline,scalingH,fmnist,non-hetero]' \
     model.kwargs.use_bias=false \

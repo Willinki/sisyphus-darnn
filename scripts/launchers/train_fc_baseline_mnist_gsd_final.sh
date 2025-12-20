@@ -12,7 +12,7 @@ uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_mnist_tuning \
     'master_seed=55,66,44,33,18' \
-    model.kwargs.dim_hidden=916 \
+    model.kwargs.dim_hidden=1000 \
     epochs=20 \
     torch_clf.epochs=20 \
     "wandb.tags=[ours,mnist,scaling-h]" \
@@ -40,7 +40,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_mnist_tuning \
-    model.kwargs.dim_hidden=1858 \
+    model.kwargs.dim_hidden=2000 \
     'master_seed=55,66' \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -69,7 +69,7 @@ uv run python scripts/python_scripts/main.py \
 uv run python scripts/python_scripts/main.py \
     --config-name=ours_sparse_mnist_tuning \
     --multirun \
-    model.kwargs.dim_hidden=2815 \
+    model.kwargs.dim_hidden=3000 \
     'master_seed=55,66,18' \
     epochs=20 \
     torch_clf.epochs=20 \
@@ -99,7 +99,7 @@ uv run python scripts/python_scripts/main.py \
     --config-name=ours_sparse_mnist_tuning \
     --multirun \
     'master_seed=55,66,18' \
-    model.kwargs.dim_hidden=3783 \
+    model.kwargs.dim_hidden=4000 \
     epochs=20 \
     torch_clf.epochs=20 \
     "wandb.tags=[ours,mnist,scaling-h]" \
@@ -128,7 +128,7 @@ uv run python scripts/python_scripts/main.py \
     --multirun \
     --config-name=ours_sparse_mnist_tuning \
     'master_seed=55,66,18' \
-    model.kwargs.dim_hidden=4758 \
+    model.kwargs.dim_hidden=5000 \
     epochs=20 \
     torch_clf.epochs=20 \
     "wandb.tags=[ours,mnist,scaling-h]" \
@@ -157,7 +157,7 @@ uv run python scripts/python_scripts/main.py \
     --config-name=ours_sparse_mnist_tuning \
     --multirun \
     'master_seed=55,66,18' \
-    model.kwargs.dim_hidden=5737 \
+    model.kwargs.dim_hidden=6000 \
     epochs=20 \
     torch_clf.epochs=20 \
     "wandb.tags=[ours,mnist,scaling-h]" \
