@@ -29,3 +29,19 @@ python scripts/python_scripts/main.py \
     wandb.project='emnist_scaling' \
     'wandb.tags=[ours,emnist,scalingH]' \
     model.kwargs.strength_back=1.75
+
+python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=1000 \
+    wandb.project='emnist_scaling' \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=3.5
+
+python scripts/python_scripts/main.py \
+    --multirun \
+    'master_seed=33,44,55,66,77' \
+    model.kwargs.dim_hidden=2000 \
+    wandb.project='emnist_scaling' \
+    'wandb.tags=[ours,emnist,scalingH]' \
+    model.kwargs.strength_back=2.5
