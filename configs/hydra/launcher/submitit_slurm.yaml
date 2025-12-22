@@ -8,20 +8,21 @@ submitit_folder: ${hydra.sweep.dir}/.submitit
 
 # SLURM resources – match your current script
 timeout_min: 20
-cpus_per_task: 4
+cpus_per_task: 2
 gpus_per_node: 0 # set to 1 if you uncomment --gres=gpu:1
 tasks_per_node: 1
 nodes: 1
 mem_gb: 8
 
 # How many jobs from the sweep can run in parallel
-array_parallelism: 32
+array_parallelism: 64
 
 name: ${hydra.job.name}
 
 # Additional raw SBATCH args
 additional_parameters:
   comment: "preemption=yes;requeue=yes"
+  account: torch_pr_147_courant
 
 # Optional: retry-on-timeout
 max_num_timeout: 0 # or >0 if you want automatic resubmits

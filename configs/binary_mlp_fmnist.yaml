@@ -1,5 +1,5 @@
 defaults:
-  - override hydra/launcher: joblib
+  - override hydra/launcher: submitit_slurm
 
 data:
   name: "fashion_mnist"
@@ -11,7 +11,7 @@ data:
     label_mode: "ooe"
 
 model:
-  name: "clipped-3layer-mlp"
+  name: binary-3layer-mlp
   kwargs:
     input_dim: 100
     hidden_dim: 1000
@@ -19,11 +19,8 @@ model:
     gain: 1.0 # kept for consistency with other builders
     lr: 1e-3
     loss_type: "argmax_margin"
-    argmax_margin: 1.0
     optim: "sgd"
     use_bias: false
-    clamp: true
-    num_hidden_layers: 2
 
 wandb:
   enabled: true

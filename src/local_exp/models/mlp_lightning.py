@@ -172,7 +172,7 @@ class MLP(nn.Module):
         layer_sizes: List[int],
         activation_gain: float = 1.0,
         binarize_activations: bool = False,
-        use_bias: bool = True,
+        use_bias: bool = False,
         dropout: float = 0.0,
     ):
         super().__init__()
@@ -414,6 +414,7 @@ class LitMLP(pl.LightningModule):
                 clamp=clamp,
             )
         else:
+            print("davide ha indovinato")
             self.model = MLP(
                 layer_sizes=model_cfg.layer_sizes,
                 activation_gain=model_cfg.activation_gain,
@@ -504,13 +505,14 @@ def build_binary_mlp(
     loss_type="cross_entropy",
     lr=1e-3,
     optim="adam",
+    use_bias=False,
 ):
     model_cfg = ModelConfig(
         layer_sizes=[input_dim, hidden_dim, hidden_dim, output_dim],
         activation_gain=gain,
         binarize_activations=True,
         dropout=0.0,
-        use_bias=True,
+        use_bias=use_bias,
         use_clipped_layers=False,
         loss_type=loss_type,
     )

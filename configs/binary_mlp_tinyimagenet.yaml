@@ -1,5 +1,5 @@
 defaults:
-  - override hydra/launcher: joblib
+  - override hydra/launcher: submitit_slurm
 
 data:
   name: "tiny_imagenet"
@@ -16,14 +16,10 @@ model:
     input_dim: 2048
     hidden_dim: 1000
     output_dim: 200
-    num_hidden_layers: 2
     gain: 1.0 # kept for consistency with other builders
     lr: 1e-3
     loss_type: "cross_entropy"
-    argmax_margin: 1.0
     optim: "sgd"
-    use_bias: false
-    clamp: true
 
 wandb:
   enabled: true
