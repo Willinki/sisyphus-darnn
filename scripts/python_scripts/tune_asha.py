@@ -15,7 +15,7 @@ from optuna.pruners import HyperbandPruner
 # ---------------------------------------------------------------------
 
 
-TORCH_LINE_REGEX = re.compile(r"\[Torch Clf\].*eval_acc=([0-9.]+)")
+TORCH_LINE_REGEX = re.compile(r"eval_acc=(0\.[0-9]+)")
 
 
 def parse_eval_acc(stdout: str) -> float:
@@ -25,14 +25,26 @@ def parse_eval_acc(stdout: str) -> float:
     Looks for lines like:
       [Torch Clf] Epoch 019 | ... | eval_acc=0.9587 | ...
     """
-    matches = TORCH_LINE_REGEX.findall(stdout)
+    # Use finditer to get Match objects so we can reliably extract the
+    # captured group containing the entire numeric token.
+    matches = list(TORCH_LINE_REGEX.finditer(stdout))
     if not matches:
         # Show log to help debugging
         print(
             "Could not find eval_acc in output. Full stdout:\n", stdout, file=sys.stderr
         )
         raise RuntimeError("No eval_acc found in Torch Clf output.")
-    return float(matches[-1])
+
+    last_match = matches[-1].group(1)
+    try:
+        return float(last_match)
+    except ValueError:
+        print(
+            f"Found eval_acc value but failed to parse as float: {last_match}\nFull stdout:\n",
+            stdout,
+            file=sys.stderr,
+        )
+        raise RuntimeError("Could not parse eval_acc value as float.")
 
 
 def build_command(trial: optuna.trial.Trial) -> list[str]:
@@ -80,7 +92,7 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         # Fixed config pieces from your original script:
         "model.kwargs.dim_hidden=300",
         "epochs=10",
-        "torch_clf.epochs=0",
+        "torch_clf.epochs=1",
         "torch_clf.enabled=true",
         "data.kwargs.x_transform=sign",
         "data.kwargs.linear_projection=100",
