@@ -46,18 +46,21 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
     # ------------------------
     # Sample hyperparameters
     # ------------------------
-    strength_back = trial.suggest_float("strength_back", 1.3, 3.0)
+    strength_back = trial.suggest_float("strength_back", 0.3, 3.0)
     strength_forth = trial.suggest_float("strength_forth", 4.2, 5.5)
-    threshold_in = trial.suggest_float("threshold_in", 1.2, 2.0)
-    threshold_j = trial.suggest_float("threshold_j", 1.2, 2.0)
+    threshold_in = trial.suggest_float("threshold_in", 0.3, 2.0)
+    threshold_j = trial.suggest_float("threshold_j", 0.3, 2.0)
+    threshold_out = trial.suggest_float("threshold_out", 0.5, 8.0)
     threshold_back = 0.0
     j_d = trial.suggest_float("j_d", 0.5, 1.0)
 
-    learning_rate_j = trial.suggest_float("learning_rate_j", 0.05, 0.4, log=True)
-    learning_rate_win = trial.suggest_float("learning_rate_win", 0.1, 0.4, log=True)
+    learning_rate_j = trial.suggest_float("learning_rate_j", 0.001, 0.4, log=True)
+    learning_rate_win = trial.suggest_float("learning_rate_win", 0.001, 0.4, log=True)
+    learning_rate_wout = trial.suggest_float("learning_rate_wout", 0.001, 0.4, log=True)
 
     weight_decay_j = trial.suggest_float("weight_decay_j", 5e-5, 3e-3, log=True)
     weight_decay_win = trial.suggest_float("weight_decay_win", 5e-4, 2e-3, log=True)
+    weight_decay_wout = trial.suggest_float("weight_decay_wout", 5e-5, 3e-3, log=True)
 
     # Optional: give each trial a tag so it's easy to spot in wandb
     trial_tag = f"optuna_trial_{trial.number}"
@@ -75,17 +78,17 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         # no --multirun: one run == one Optuna trial
         #
         # Fixed config pieces from your original script:
-        "model.kwargs.dim_hidden=250",
-        "epochs=20",
-        "torch_clf.epochs=20",
+        "model.kwargs.dim_hidden=300",
+        "epochs=10",
+        "torch_clf.epochs=0",
         "torch_clf.enabled=true",
-        "data.kwargs.x_transform=identity",
-        "data.kwargs.linear_projection=null",
-        "data.kwargs.batch_size=16",
+        "data.kwargs.x_transform=sign",
+        "data.kwargs.linear_projection=100",
+        "data.kwargs.batch_size=1",
         "model.name=fc-baseline-sparse-fully",
-        "model.kwargs.dim_data=784",
-        "model.kwargs.sparsity=0.99",
-        "model.kwargs.sparsity_win=0.9",
+        "model.kwargs.dim_data=100",
+        "model.kwargs.sparsity=0.0",
+        "model.kwargs.sparsity_win=0.0",
         "trainer.fake_dynamics.k=0.5",
         # you can optionally turn off wandb in sweeps to save time
         # "wandb.enabled=false",
@@ -102,15 +105,15 @@ def build_command(trial: optuna.trial.Trial) -> list[str]:
         f"model.kwargs.strength_forth={strength_forth}",
         f"model.kwargs.threshold_in={threshold_in}",
         f"model.kwargs.threshold_j={threshold_j}",
+        f"model.kwargs.threshold_out={threshold_out}",
         f"model.kwargs.threshold_back={threshold_back}",
         f"model.kwargs.j_d={j_d}",
         f"optimizer.learning_rate_j={learning_rate_j}",
         f"optimizer.learning_rate_win={learning_rate_win}",
+        f"optimizer.learning_rate_wout={learning_rate_wout}",
         f"optimizer.weight_decay_j={weight_decay_j}",
         f"optimizer.weight_decay_win={weight_decay_win}",
-        # keep these from your script
-        "optimizer.weight_decay_wout=0.02",
-        "optimizer.learning_rate_wout=0.17",
+        f"optimizer.weight_decay_wout={weight_decay_wout}",
         # if you have learning_rate_wback in config and want to keep it fixed,
         # you can add it here as well.
     ]
@@ -164,23 +167,23 @@ def objective(trial: optuna.trial.Trial) -> float:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n-trials", type=int, default=50)
+    parser.add_argument("--n-trials", type=int, default=500)
     parser.add_argument(
         "--n-jobs",
         type=int,
-        default=1,
+        default=10,
         help="Parallel trials. >1 uses multi-process parallelism.",
     )
     parser.add_argument(
         "--storage",
         type=str,
         default=None,
-        help="Optuna storage URL, e.g. sqlite:///optuna_mnist.db",
+        help="Optuna storage URL, e.g. sqlite:///optuna_emnist.db",
     )
     parser.add_argument(
         "--study-name",
         type=str,
-        default="mnist_sparse_optuna",
+        default="emnist_bsize1_optuna",
     )
     args = parser.parse_args()
 
